@@ -27,8 +27,10 @@ public:
 	bool updateAndRender();
 	void Render();
 	void Update(float elapsed);
+	Entity player; 
 
 private:
+	int screenWidth, screenHeight;
 	bool done;
 	float lastFrameTicks;
 	SDL_Window*	displayWindow;

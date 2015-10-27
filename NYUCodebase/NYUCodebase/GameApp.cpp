@@ -15,9 +15,27 @@ GLuint LoadTexture(const char *image_path){
 
 	return textureID;
 }
+GLuint LoadTextureAlpha(const char *image_path){
+	SDL_Surface *surface = IMG_Load(image_path);
+
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, surface->pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	SDL_FreeSurface(surface);
+
+	return textureID;
+}
+
+//=====================================================================================================================
 
 GameApp::GameApp() :
-done(false), lastFrameTicks(0.0f), displayWindow(nullptr), program(nullptr) {
+done(false), lastFrameTicks(0.0f), displayWindow(nullptr), program(nullptr),player(NULL),
+screenWidth(640), screenHeight(360){
 
 	setup();
 }
@@ -32,19 +50,16 @@ void GameApp::setup() {
 #endif
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glViewport(0, 0, 640, 360);
+	glViewport(0, 0, screenWidth, screenHeight);
 	program = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-
-	projectionMatrix.setOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
+	projectionMatrix.setOrthoProjection(-screenWidth / 20, screenWidth / 20, -screenHeight / 20, screenHeight / 20, -1.0f, 1.0f);
 	program->setModelMatrix(modelMatrix);
 	program->setProjectionMatrix(projectionMatrix);
 	program->setViewMatrix(viewMatrix);
 	glUseProgram(program->programID);
-
-	GLuint backGroundTexture = LoadTexture("backgrounds.png");
-	SheetSprite* sprite = new SheetSprite(backGroundTexture, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-	Entity* entity = new Entity(this, sprite);
-	entities.push_back(entity);
+	GLuint playerTexture = LoadTextureAlpha("smiley.png");
+	player = Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f), 0, 0);
+	entities.push_back(&player);
 }
 GameApp::~GameApp() {
 	// SDL and OpenGL cleanup (joysticks, textures, etc).
@@ -55,6 +70,9 @@ void GameApp::Render() {
 	glClearColor(0.4f, 0.2f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	for (size_t i = 0; i < entities.size(); i++) {
+		//modelMatrix.identity();
+		//modelMatrix = entities[i]->transMatrix;
+		program->setModelMatrix(entities[i]->transMatrix);
 		entities[i]->draw();
 	}
 	SDL_GL_SwapWindow(displayWindow);
@@ -68,10 +86,13 @@ void GameApp::ProcessEvents() {
 		// check for input events
 		const Uint8 *keys = SDL_GetKeyboardState(NULL);
 		if (keys[SDL_SCANCODE_LEFT]){
-
-		}
-		else if (keys[SDL_SCANCODE_RIGHT]){
-
+			player.accel_x = -2;
+		}else if (keys[SDL_SCANCODE_RIGHT]){
+			player.accel_x = 2;
+		}else if (keys[SDL_SCANCODE_UP]){
+			player.accel_y = 2;
+		}else if (keys[SDL_SCANCODE_DOWN]){
+			player.accel_y = -2;
 		}
 	}
 }
@@ -80,6 +101,7 @@ void GameApp::Update(float elapsed) {
 	// check for collisions and respond to them
 	for (size_t i = 0; i < entities.size(); i++) {
 		entities[i]->update(elapsed);
+
 	}
 }
 
