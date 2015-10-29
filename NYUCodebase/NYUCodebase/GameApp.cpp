@@ -34,7 +34,7 @@ GLuint LoadTextureAlpha(const char *image_path){
 //=====================================================================================================================
 
 GameApp::GameApp() :
-done(false), lastFrameTicks(0.0f), displayWindow(nullptr), program(nullptr),player(NULL),
+done(false), lastFrameTicks(0.0f), displayWindow(nullptr), program(nullptr),
 screenWidth(640), screenHeight(360){
 
 	setup();
@@ -58,8 +58,12 @@ void GameApp::setup() {
 	program->setViewMatrix(viewMatrix);
 	glUseProgram(program->programID);
 	GLuint playerTexture = LoadTextureAlpha("smiley.png");
-	player = Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f), 0, 0);
-	entities.push_back(&player);
+	GLuint blockTexture = LoadTexture("backgrounds.png");
+	player = new Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f), 0, 10);
+	Entity* block =  new Entity(this, SheetSprite(blockTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f), 0, 0);
+	entities.push_back(player);
+	entities.push_back(block);
+
 }
 GameApp::~GameApp() {
 	// SDL and OpenGL cleanup (joysticks, textures, etc).
@@ -70,9 +74,7 @@ void GameApp::Render() {
 	glClearColor(0.4f, 0.2f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	for (size_t i = 0; i < entities.size(); i++) {
-		//modelMatrix.identity();
-		//modelMatrix = entities[i]->transMatrix;
-		program->setModelMatrix(entities[i]->transMatrix);
+		program->setModelMatrix(entities[i]->matrix);
 		entities[i]->draw();
 	}
 	SDL_GL_SwapWindow(displayWindow);
@@ -86,13 +88,13 @@ void GameApp::ProcessEvents() {
 		// check for input events
 		const Uint8 *keys = SDL_GetKeyboardState(NULL);
 		if (keys[SDL_SCANCODE_LEFT]){
-			player.accel_x = -2;
+			player->accel_x = -5;
 		}else if (keys[SDL_SCANCODE_RIGHT]){
-			player.accel_x = 2;
+			player->accel_x = 5;
 		}else if (keys[SDL_SCANCODE_UP]){
-			player.accel_y = 2;
+			player->accel_y = 5;
 		}else if (keys[SDL_SCANCODE_DOWN]){
-			player.accel_y = -2;
+			player->accel_y = -5;
 		}
 	}
 }

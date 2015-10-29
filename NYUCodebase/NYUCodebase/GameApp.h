@@ -19,6 +19,7 @@
 class Entity;
 class GameApp{
 	friend class SheetSprite;
+	friend class Entity;
 public:
 	GameApp();
 	~GameApp();
@@ -27,7 +28,7 @@ public:
 	bool updateAndRender();
 	void Render();
 	void Update(float elapsed);
-	Entity player; 
+	Entity* player; 
 
 private:
 	int screenWidth, screenHeight;
