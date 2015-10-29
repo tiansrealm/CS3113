@@ -14,10 +14,11 @@ Entity::Entity(GameApp *app, SheetSprite& sprite, float x, float y) :
 app(app), sprite(sprite), x(x), y(y), velocity_x(0.0f), velocity_y(0.0f),
 accel_x(0.0f), accel_y(0.0f), shape("rectangle")
 {
-	height = sprite.size;
-	width = sprite.size * sprite.height / sprite.width;
+	height = sprite.height;
+	width = sprite.width;
 	matrix.identity();
 	matrix.Translate(x, y, 0);
+	stationary == false;
 }
 void Entity::draw(){
 	sprite.draw(app);
@@ -27,10 +28,20 @@ void Entity::update(float elapsed){
 	float friction_x = 0.5;
 	float friction_y = 0.5;
 
+	//float gravity_x = 0 ;
+	float gravity_y = -9.81;
+	if (!stationary){
+		velocity_y += gravity_y * elapsed;
+	}
+
+
 	velocity_x = lerp(velocity_x, 0.0f, elapsed * friction_x);
-	velocity_y = lerp(velocity_y, 0.0f, elapsed * friction_y);
+	//velocity_y = lerp(velocity_y, 0.0f, elapsed * friction_y);
+	accel_x = lerp(accel_x, 0.0f, elapsed * 3 * friction_x);
 	velocity_x += accel_x * elapsed;
 	velocity_y += accel_y * elapsed;
+
+	
 	move(velocity_x * elapsed, velocity_y * elapsed);
 
 
@@ -46,10 +57,10 @@ void Entity::update(float elapsed){
 	matrix.Translate(x, y, 0);
 	*/
 }
-void Entity::move(float xShift, float yShift){
-	x += xShift;
-	y += yShift;
-	matrix.Translate(xShift, yShift, 0);
+void Entity::move(float x_shift, float y_shift){
+	x += x_shift;
+	y += y_shift;
+	matrix.Translate(x_shift, y_shift, 0);
 }
 bool Entity::collidesWith(const Entity& other, bool applyShift){
 	if (shape == "rectangle" && other.shape == "rectangle"){
@@ -107,30 +118,30 @@ circleEntity::circleEntity(GameApp * app, SheetSprite& sprite, float x, float y)
 SheetSprite::SheetSprite(){}
 
 SheetSprite::SheetSprite(unsigned int textureID, float u, float v, float width, float height, float size) :
-textureID(textureID), u(u), v(v), width(width), height(height), size(size)
-{}
+textureID(textureID), u(u), v(v), u_width(width), v_height(height), size(size), height(size), width(size * u_width / v_height)
+{
+}
 void SheetSprite::draw(GameApp* app){
 	glBindTexture(GL_TEXTURE_2D, textureID);
-		GLfloat texCoords[] = {
-			u, v + height,
-			u + width, v,
-			u, v,
-			u + width, v,
-			u, v + height,
-			u + width, v + height
-		};
-
-		float scale_height = size;
-		float scale_width = size * width / height;
-		//float aspect = width/height
-		float vertices[] = {
+	GLfloat texCoords[] = {
+		u, v + v_height,
+		u + u_width, v,
+		u, v,
+		u + u_width, v,
+		u, v + v_height,
+		u + u_width, v + v_height
+	};
+	//height = size;
+	//width = size * width / height;
+	//float aspect = width/height
+	float vertices[] = {
 			//top left corner = 0,0
-			0.0f, -1.0f * scale_height,
-			1.0f * scale_width, 0.0f,
-			0.0f, 0.0 * scale_height,
-			1.0f * scale_width, 0.0f,
-			0.0f, -1.0f * scale_height,
-			1.0f * scale_width, -1.0f * scale_height
+			0.0f, -1.0f * height,
+			1.0f * width, 0.0f,
+			0.0f, 0.0 * height,
+			1.0f * width, 0.0f,
+			0.0f, -1.0f * height,
+			1.0f * width, -1.0f * height
 
 			//centered around 0,0
 			/*

@@ -12,6 +12,8 @@ public:
 	unsigned int textureID;
 	float u;
 	float v;
+	float u_width;
+	float v_height;
 	float width;
 	float height;
 	float size;
@@ -40,6 +42,7 @@ protected:
 	float height;
 	float speed;
 	std::string shape;
+	bool stationary;
 };
 
 

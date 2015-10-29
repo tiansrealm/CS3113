@@ -52,17 +52,23 @@ void GameApp::setup() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glViewport(0, 0, screenWidth, screenHeight);
 	program = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-	projectionMatrix.setOrthoProjection(-screenWidth / 20, screenWidth / 20, -screenHeight / 20, screenHeight / 20, -1.0f, 1.0f);
+	projectionMatrix.setOrthoProjection(-screenWidth/10, screenWidth/10, -screenHeight/10, screenHeight/10, -1.0f, 1.0f);
 	program->setModelMatrix(modelMatrix);
 	program->setProjectionMatrix(projectionMatrix);
 	program->setViewMatrix(viewMatrix);
 	glUseProgram(program->programID);
 	GLuint playerTexture = LoadTextureAlpha("smiley.png");
 	GLuint blockTexture = LoadTexture("backgrounds.png");
-	player = new Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f), 0, 10);
-	Entity* block =  new Entity(this, SheetSprite(blockTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f), 0, 0);
+	player = new Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f), 0, 20);
 	entities.push_back(player);
-	entities.push_back(block);
+	
+	SheetSprite blockSprite = SheetSprite(blockTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f);
+	for (int i = 0; i < 10; ++i){
+		Entity* block = new Entity(this, blockSprite, (i - 5) * 2 * blockSprite.width, i*3);
+		block->stationary = true;
+		entities.push_back(block);
+	}
+	
 
 }
 GameApp::~GameApp() {
@@ -88,13 +94,16 @@ void GameApp::ProcessEvents() {
 		// check for input events
 		const Uint8 *keys = SDL_GetKeyboardState(NULL);
 		if (keys[SDL_SCANCODE_LEFT]){
-			player->accel_x = -5;
-		}else if (keys[SDL_SCANCODE_RIGHT]){
-			player->accel_x = 5;
-		}else if (keys[SDL_SCANCODE_UP]){
-			player->accel_y = 5;
-		}else if (keys[SDL_SCANCODE_DOWN]){
-			player->accel_y = -5;
+			player->accel_x = -10;
+		}
+		if (keys[SDL_SCANCODE_RIGHT]){
+			player->accel_x = 10;
+		}
+		if (keys[SDL_SCANCODE_UP]){
+			player->velocity_y = 15;
+		}
+		if (keys[SDL_SCANCODE_DOWN]){
+			//player->accel_y = -10;
 		}
 	}
 }
