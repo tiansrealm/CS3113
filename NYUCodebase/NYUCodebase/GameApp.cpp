@@ -1,4 +1,11 @@
 #include "GameApp.h"
+#include <fstream>
+
+#include <iostream>
+#include <sstream>
+
+using namespace std;
+
 
 GLuint LoadTexture(const char *image_path){
 	SDL_Surface *surface = IMG_Load(image_path);
@@ -35,7 +42,7 @@ GLuint LoadTextureAlpha(const char *image_path){
 
 GameApp::GameApp() :
 done(false), lastFrameTicks(0.0f), displayWindow(nullptr), program(nullptr),
-screenWidth(640), screenHeight(360){
+screenWidth(640), screenHeight(320){
 
 	setup();
 }
@@ -52,24 +59,15 @@ void GameApp::setup() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glViewport(0, 0, screenWidth, screenHeight);
 	program = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-	projectionMatrix.setOrthoProjection(-screenWidth/10, screenWidth/10, -screenHeight/10, screenHeight/10, -1.0f, 1.0f);
-	program->setModelMatrix(modelMatrix);
+	projectionMatrix.setOrthoProjection(-screenWidth/2, screenWidth/2, -screenHeight/2, screenHeight/2, -1.0f, 1.0f);
 	program->setProjectionMatrix(projectionMatrix);
 	program->setViewMatrix(viewMatrix);
 	glUseProgram(program->programID);
 	GLuint playerTexture = LoadTextureAlpha("smiley.png");
-	GLuint blockTexture = LoadTexture("backgrounds.png");
-	player = new Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f), 0, 20);
+	player = new Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 16.0f), 0, 0);
 	entities.push_back(player);
 	
-	SheetSprite blockSprite = SheetSprite(blockTexture, 0.0f, 0.0f, 1.0f, 1.0f, 5.0f);
-	for (int i = 0; i < 10; ++i){
-		Entity* block = new Entity(this, blockSprite, (i - 5) * 2 * blockSprite.width, i*3);
-		block->stationary = true;
-		entities.push_back(block);
-	}
-	
-
+	loadMap();
 }
 GameApp::~GameApp() {
 	// SDL and OpenGL cleanup (joysticks, textures, etc).
@@ -83,6 +81,9 @@ void GameApp::Render() {
 		program->setModelMatrix(entities[i]->matrix);
 		entities[i]->draw();
 	}
+	viewMatrix.identity();
+	viewMatrix.Translate(-player->x, -player->y, 0);
+	program->setViewMatrix(viewMatrix);
 	SDL_GL_SwapWindow(displayWindow);
 }
 void GameApp::ProcessEvents() {
@@ -94,13 +95,13 @@ void GameApp::ProcessEvents() {
 		// check for input events
 		const Uint8 *keys = SDL_GetKeyboardState(NULL);
 		if (keys[SDL_SCANCODE_LEFT]){
-			player->accel_x = -10;
+			player->accel_x = -50;
 		}
 		if (keys[SDL_SCANCODE_RIGHT]){
-			player->accel_x = 10;
+			player->accel_x = 50;
 		}
 		if (keys[SDL_SCANCODE_UP]){
-			player->velocity_y = 15;
+			player->velocity_y = 60;
 		}
 		if (keys[SDL_SCANCODE_DOWN]){
 			//player->accel_y = -10;
@@ -124,4 +125,134 @@ bool GameApp::updateAndRender() {
 	Update(elapsed);
 	Render();
 	return done;
+}
+
+//===========================================load map
+void GameApp::loadMap(){
+
+	ifstream infile("testMap.txt");
+	string line;
+	while (getline(infile, line)) {
+		if (line == "[header]") {
+			if (!readHeader(infile)) {
+				return;
+			}
+		}
+		else if (line == "[layer]") {
+			readLayerData(infile);
+		}
+		else if (line == "[Object Layer]") {
+			readEntityData(infile);
+		}
+	}
+	//
+	GLuint spriteSheetTexture = LoadTextureAlpha("arne_sprites.png");
+	int SPRITE_COUNT_X = 16;
+	int SPRITE_COUNT_Y = 8;
+	for (int y = 0; y < mapHeight; y++) {
+		for (int x = 0; x < mapWidth; x++) {
+			int data = (int)mapData[y][x];
+			if (data != 0){
+				float u = (float)((data-1) % SPRITE_COUNT_X) / (float)SPRITE_COUNT_X;
+				float v = (float)((data-1) / SPRITE_COUNT_X) / (float)SPRITE_COUNT_Y;
+				SheetSprite tileSprite = SheetSprite(spriteSheetTexture, u, v, 16 / 256.0f, 16 / 128.0f, 16.0f);
+				//float test = x * TILE_SIZE;// - screenWidth / 2;
+				float newX = x * 16 - screenWidth / 2;
+				Entity* tile = new Entity(this, tileSprite, newX, -y * 16 + screenHeight/2);
+				tile->stationary = true;
+				entities.push_back(tile);
+			}
+		}
+	}
+}
+
+bool GameApp::readHeader(std::ifstream &stream) {
+	string line;
+	mapWidth = -1;
+	mapHeight = -1;
+	while (getline(stream, line)) {
+		if (line == "") { break; }
+		istringstream sStream(line);
+		string key, value;
+		getline(sStream, key, '=');
+		getline(sStream, value);
+		if (key == "width") {
+			mapWidth = atoi(value.c_str());
+		}
+		else if (key == "height"){
+			mapHeight = atoi(value.c_str());
+		}
+	}
+	if (mapWidth == -1 || mapHeight == -1) {
+		return false;
+	}
+	else { // allocate our map data
+		mapData = new unsigned char*[mapHeight];
+		for (int i = 0; i < mapHeight; ++i) {
+			mapData[i] = new unsigned char[mapWidth];
+		}
+		return true;
+	}
+}
+
+bool GameApp::readLayerData(std::ifstream &stream) {
+	string line;
+	while (getline(stream, line)) {
+		if (line == "") { break; }
+		istringstream sStream(line);
+		string key, value;
+		getline(sStream, key, '=');
+		getline(sStream, value);
+		if (key == "data") {
+			for (int y = 0; y < mapHeight; y++) {
+				getline(stream, line);
+				istringstream lineStream(line);
+				string tile;
+				for (int x = 0; x < mapWidth; x++) {
+					getline(lineStream, tile, ',');
+					unsigned char val = (unsigned char)atoi(tile.c_str());
+					if (val > 0) {
+						//tiles in this format are indexed from 1 not 0
+						mapData[y][x] = val;
+					}
+					else {
+						mapData[y][x] = 0;
+					}
+				}
+			}
+		}
+	}
+	return true;
+}
+
+bool GameApp::readEntityData(std::ifstream &stream) {
+	string line;
+	string type;
+	while (getline(stream, line)) {
+		if (line == "") { break; }
+		istringstream sStream(line);
+		string key, value;
+		getline(sStream, key, '=');
+		getline(sStream, value);
+		if (key == "type") {
+			type = value;
+		}
+		else if (key == "location") {
+			istringstream lineStream(value);
+			string xPosition, yPosition;
+			getline(lineStream, xPosition, ',');
+			getline(lineStream, yPosition, ',');
+				float placeX = atoi(xPosition.c_str()) * 16 - screenWidth / 2;
+			float placeY = atoi(yPosition.c_str()) * -16 + screenHeight /2 + 10;//10 extra to spawn on top platform
+			placeEntity(type, placeX, placeY);
+		}
+	}
+	return true;
+}
+
+void GameApp::placeEntity(string& type, float x, float y){
+	GLuint spriteSheetTexture = LoadTextureAlpha("arne_sprites.png");
+	SheetSprite enemySprite = SheetSprite(spriteSheetTexture, 0.0f, 5.0/8.0f, 16/256.0f, 16/128.0f, 16.0f);
+	Entity* enemy = new Entity(this, enemySprite, x , y );
+	entities.push_back(enemy);
 }

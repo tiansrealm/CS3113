@@ -1,6 +1,5 @@
 #pragma once
 #include "GameApp.h"
-#include "string.h"
 class GameApp;
 class SheetSprite{
 public:
@@ -19,6 +18,7 @@ public:
 	float size;
 };
 
+enum EntityShape{RECTANGLE, CIRCLE};
 class Entity {
 	friend class GameApp;
 public:
@@ -41,8 +41,12 @@ protected:
 	float width;
 	float height;
 	float speed;
-	std::string shape;
+	EntityShape shape;
 	bool stationary;
+	bool collideTop;
+	bool collideBot;
+	bool collideLeft;
+	bool collideRight;
 };
 
 

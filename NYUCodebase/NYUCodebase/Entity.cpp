@@ -12,13 +12,13 @@ Entity::Entity(){}
 
 Entity::Entity(GameApp *app, SheetSprite& sprite, float x, float y) : 
 app(app), sprite(sprite), x(x), y(y), velocity_x(0.0f), velocity_y(0.0f),
-accel_x(0.0f), accel_y(0.0f), shape("rectangle")
+accel_x(0.0f), accel_y(0.0f), shape(RECTANGLE), stationary(false),
+collideTop(false), collideBot(false), collideLeft(false), collideRight(false)
 {
 	height = sprite.height;
 	width = sprite.width;
 	matrix.identity();
 	matrix.Translate(x, y, 0);
-	stationary == false;
 }
 void Entity::draw(){
 	sprite.draw(app);
@@ -29,7 +29,7 @@ void Entity::update(float elapsed){
 	float friction_y = 0.5;
 
 	//float gravity_x = 0 ;
-	float gravity_y = -9.81;
+	float gravity_y = -9.81 * 3;
 	if (!stationary){
 		velocity_y += gravity_y * elapsed;
 	}
@@ -63,7 +63,7 @@ void Entity::move(float x_shift, float y_shift){
 	matrix.Translate(x_shift, y_shift, 0);
 }
 bool Entity::collidesWith(const Entity& other, bool applyShift){
-	if (shape == "rectangle" && other.shape == "rectangle"){
+	if (shape == RECTANGLE && other.shape == RECTANGLE){
 		float r1Top = y, r2Top = other.y;
 		float r1Bottom = y - height, r2Bottom = other.y - other.height;
 		float r1Left = x, r2Left = other.x;
@@ -82,15 +82,22 @@ bool Entity::collidesWith(const Entity& other, bool applyShift){
 				
 				if (largestIntersect == topIntersect){
 					move(0, -(topIntersect + extra));
+					collideTop = true;
 				}
 				else  if (largestIntersect == botIntersect){
 					move(0, botIntersect + extra);
+					velocity_y = 0;
+					collideBot = true;
 				}
 				else if (largestIntersect == leftIntersect){
 					move(leftIntersect + extra, 0);
+					velocity_x = 0;
+					collideLeft = true;
 				}
 				else if (largestIntersect == rightIntersect){
 					move(-(rightIntersect + extra), 0);
+					velocity_x = 0;
+					collideRight = true;
 				}
 			}
 		return true;
@@ -108,7 +115,7 @@ circleEntity::circleEntity(GameApp * app, SheetSprite& sprite, float x, float y)
 	}
 	else{ throw "need square spriteTexture for circle entity"; }
 
-	shape = "circle";
+	shape = CIRCLE;
 
 }
 
@@ -118,7 +125,7 @@ circleEntity::circleEntity(GameApp * app, SheetSprite& sprite, float x, float y)
 SheetSprite::SheetSprite(){}
 
 SheetSprite::SheetSprite(unsigned int textureID, float u, float v, float width, float height, float size) :
-textureID(textureID), u(u), v(v), u_width(width), v_height(height), size(size), height(size), width(size * u_width / v_height)
+textureID(textureID), u(u), v(v), u_width(width), v_height(height), size(size), height(size), width(size)
 {
 }
 void SheetSprite::draw(GameApp* app){

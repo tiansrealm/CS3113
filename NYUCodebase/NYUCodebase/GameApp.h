@@ -10,12 +10,16 @@
 #include <vector>
 #include "Matrix.h"
 #include "Entity.h"
-
+#include <string>
 #ifdef _WINDOWS
 #define RESOURCE_FOLDER ""
 #else
 #define RESOURCE_FOLDER "NYUCodebase.app/Contents/Resources/"
 #endif
+
+#define TILE_SIZE 16;
+
+
 class Entity;
 class GameApp{
 	friend class SheetSprite;
@@ -30,8 +34,15 @@ public:
 	void Update(float elapsed);
 	Entity* player; 
 
+	bool readHeader(std::ifstream &stream);
+	bool readLayerData(std::ifstream &stream);
+	bool readEntityData(std::ifstream &stream);
+	void loadMap();
+	void placeEntity(std::string& type, float x, float y);
 private:
 	int screenWidth, screenHeight;
+	int mapWidth, mapHeight;
+	unsigned char** mapData;
 	bool done;
 	float lastFrameTicks;
 	SDL_Window*	displayWindow;
