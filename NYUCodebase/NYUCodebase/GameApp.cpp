@@ -59,7 +59,7 @@ void GameApp::setup() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glViewport(0, 0, screenWidth, screenHeight);
 	program = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-	projectionMatrix.setOrthoProjection(-screenWidth/2, screenWidth/2, -screenHeight/2, screenHeight/2, -1.0f, 1.0f);
+	projectionMatrix.setOrthoProjection(-screenWidth/4, screenWidth/4, -screenHeight/4, screenHeight/4, -1.0f, 1.0f);
 	program->setProjectionMatrix(projectionMatrix);
 	program->setViewMatrix(viewMatrix);
 	glUseProgram(program->programID);
@@ -87,25 +87,25 @@ void GameApp::Render() {
 	SDL_GL_SwapWindow(displayWindow);
 }
 void GameApp::ProcessEvents() {
+	// check for input events
+	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
 			done = true;
 		}
-		// check for input events
-		const Uint8 *keys = SDL_GetKeyboardState(NULL);
-		if (keys[SDL_SCANCODE_LEFT]){
-			player->accel_x = -50;
+		else if (event.type == SDL_KEYDOWN){
+			if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
+				player->velocity_y = 130;
+			}
 		}
-		if (keys[SDL_SCANCODE_RIGHT]){
-			player->accel_x = 50;
-		}
-		if (keys[SDL_SCANCODE_UP]){
-			player->velocity_y = 60;
-		}
-		if (keys[SDL_SCANCODE_DOWN]){
-			//player->accel_y = -10;
-		}
+	}
+	
+	if (keys[SDL_SCANCODE_LEFT]) {
+		player->accel_x = -60;
+	}
+	else if (keys[SDL_SCANCODE_RIGHT]) {
+		player->accel_x = 60;
 	}
 }
 void GameApp::Update(float elapsed) {

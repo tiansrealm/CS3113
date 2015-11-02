@@ -25,11 +25,11 @@ void Entity::draw(){
 }
 
 void Entity::update(float elapsed){
-	float friction_x = 0.5;
-	float friction_y = 0.5;
+	float friction_x = 1.0;
+	float friction_y = 1.0;
 
 	//float gravity_x = 0 ;
-	float gravity_y = -9.81 * 3;
+	float gravity_y = -9.81 * 10;
 	if (!stationary){
 		velocity_y += gravity_y * elapsed;
 	}
@@ -37,7 +37,7 @@ void Entity::update(float elapsed){
 
 	velocity_x = lerp(velocity_x, 0.0f, elapsed * friction_x);
 	//velocity_y = lerp(velocity_y, 0.0f, elapsed * friction_y);
-	accel_x = lerp(accel_x, 0.0f, elapsed * 3 * friction_x);
+	accel_x = lerp(accel_x, 0.0f, elapsed *  friction_x);
 	velocity_x += accel_x * elapsed;
 	velocity_y += accel_y * elapsed;
 
