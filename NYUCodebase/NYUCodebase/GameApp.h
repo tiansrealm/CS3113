@@ -17,7 +17,7 @@
 #define RESOURCE_FOLDER "NYUCodebase.app/Contents/Resources/"
 #endif
 
-#define TILE_SIZE 16;
+#define TILE_SIZE 16
 
 
 class Entity;
@@ -53,6 +53,7 @@ private:
 
 	ShaderProgram *program;
 	std::vector<Entity*> entities;
+	std::vector<Entity*> staticEntities;
 };
 
 

@@ -59,14 +59,14 @@ void GameApp::setup() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glViewport(0, 0, screenWidth, screenHeight);
 	program = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-	projectionMatrix.setOrthoProjection(-screenWidth/4, screenWidth/4, -screenHeight/4, screenHeight/4, -1.0f, 1.0f);
+	projectionMatrix.setOrthoProjection(-screenWidth / 4, screenWidth / 4, -screenHeight / 4, screenHeight / 4, -1.0f, 1.0f);
 	program->setProjectionMatrix(projectionMatrix);
 	program->setViewMatrix(viewMatrix);
 	glUseProgram(program->programID);
 	GLuint playerTexture = LoadTextureAlpha("smiley.png");
-	player = new Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 16.0f), 0, 0);
+	player = new Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 16.0f, 16.0f), 0, 0);
 	entities.push_back(player);
-	
+
 	loadMap();
 }
 GameApp::~GameApp() {
@@ -80,6 +80,10 @@ void GameApp::Render() {
 	for (size_t i = 0; i < entities.size(); i++) {
 		program->setModelMatrix(entities[i]->matrix);
 		entities[i]->draw();
+	}
+	for (size_t i = 0; i < staticEntities.size(); i++) {
+		program->setModelMatrix(staticEntities[i]->matrix);
+		staticEntities[i]->draw();
 	}
 	viewMatrix.identity();
 	viewMatrix.Translate(-player->x, -player->y, 0);
@@ -100,7 +104,7 @@ void GameApp::ProcessEvents() {
 			}
 		}
 	}
-	
+
 	if (keys[SDL_SCANCODE_LEFT]) {
 		player->accel_x = -60;
 	}
@@ -113,7 +117,9 @@ void GameApp::Update(float elapsed) {
 	// check for collisions and respond to them
 	for (size_t i = 0; i < entities.size(); i++) {
 		entities[i]->update(elapsed);
-
+	}
+	for (size_t i = 0; i < staticEntities.size(); i++) {
+		staticEntities[i]->update(elapsed);
 	}
 }
 
@@ -155,12 +161,12 @@ void GameApp::loadMap(){
 			if (data != 0){
 				float u = (float)((data-1) % SPRITE_COUNT_X) / (float)SPRITE_COUNT_X;
 				float v = (float)((data-1) / SPRITE_COUNT_X) / (float)SPRITE_COUNT_Y;
-				SheetSprite tileSprite = SheetSprite(spriteSheetTexture, u, v, 16 / 256.0f, 16 / 128.0f, 16.0f);
-				//float test = x * TILE_SIZE;// - screenWidth / 2;
+				SheetSprite tileSprite = SheetSprite(spriteSheetTexture, u, v, 16 / 256.0f, 16 / 128.0f, 16.0f, 16.0f);
+				float test = x * TILE_SIZE - screenWidth / 2;
 				float newX = x * 16 - screenWidth / 2;
 				Entity* tile = new Entity(this, tileSprite, newX, -y * 16 + screenHeight/2);
-				tile->stationary = true;
-				entities.push_back(tile);
+				tile->is_static = true;
+				staticEntities.push_back(tile);
 			}
 		}
 	}
@@ -243,7 +249,7 @@ bool GameApp::readEntityData(std::ifstream &stream) {
 			getline(lineStream, xPosition, ',');
 			getline(lineStream, yPosition, ',');
 				float placeX = atoi(xPosition.c_str()) * 16 - screenWidth / 2;
-			float placeY = atoi(yPosition.c_str()) * -16 + screenHeight /2 + 10;//10 extra to spawn on top platform
+			float placeY = atoi(yPosition.c_str()) * -16 + screenHeight;
 			placeEntity(type, placeX, placeY);
 		}
 	}
@@ -252,7 +258,7 @@ bool GameApp::readEntityData(std::ifstream &stream) {
 
 void GameApp::placeEntity(string& type, float x, float y){
 	GLuint spriteSheetTexture = LoadTextureAlpha("arne_sprites.png");
-	SheetSprite enemySprite = SheetSprite(spriteSheetTexture, 0.0f, 5.0/8.0f, 16/256.0f, 16/128.0f, 16.0f);
+	SheetSprite enemySprite = SheetSprite(spriteSheetTexture, 0.0f, 5.0/8.0f, 16/256.0f, 16/128.0f, 16.0f, 16.0f);
 	Entity* enemy = new Entity(this, enemySprite, x , y );
 	entities.push_back(enemy);
 }

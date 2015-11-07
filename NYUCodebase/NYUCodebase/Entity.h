@@ -4,7 +4,7 @@ class GameApp;
 class SheetSprite{
 public:
 	SheetSprite();
-	SheetSprite(unsigned int textureID, float u, float v, float width, float height, float size);
+	SheetSprite(unsigned int textureID, float u, float v, float u_w, float v_h, float w, float h);
 
 	void draw(GameApp* app);
 
@@ -42,7 +42,7 @@ protected:
 	float height;
 	float speed;
 	EntityShape shape;
-	bool stationary;
+	bool is_static;
 	bool collideTop;
 	bool collideBot;
 	bool collideLeft;

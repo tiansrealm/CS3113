@@ -10,9 +10,9 @@ bool circleCollison(float x1, float x2, float y1, float y2, float r1, float r2){
 }
 Entity::Entity(){}
 
-Entity::Entity(GameApp *app, SheetSprite& sprite, float x, float y) : 
+Entity::Entity(GameApp *app, SheetSprite& sprite, float x, float y) :
 app(app), sprite(sprite), x(x), y(y), velocity_x(0.0f), velocity_y(0.0f),
-accel_x(0.0f), accel_y(0.0f), shape(RECTANGLE), stationary(false),
+accel_x(0.0f), accel_y(0.0f), shape(RECTANGLE), is_static(false),
 collideTop(false), collideBot(false), collideLeft(false), collideRight(false)
 {
 	height = sprite.height;
@@ -30,7 +30,7 @@ void Entity::update(float elapsed){
 
 	//float gravity_x = 0 ;
 	float gravity_y = -9.81 * 10;
-	if (!stationary){
+	if (!is_static){
 		velocity_y += gravity_y * elapsed;
 	}
 
@@ -41,21 +41,21 @@ void Entity::update(float elapsed){
 	velocity_x += accel_x * elapsed;
 	velocity_y += accel_y * elapsed;
 
-	
+
 	move(velocity_x * elapsed, velocity_y * elapsed);
 
-
-	for (size_t i = 0; i < app->entities.size(); i++){
-		if (this != app->entities[i]){
-			collidesWith(*(app->entities[i]), true);
+	if (!is_static){
+		for (size_t i = 0; i < app->entities.size(); i++){
+			//if (this != app->entities[i]){
+			//	collidesWith(*(app->entities[i]), true);
+			//}
+		}
+		for (size_t i = 0; i < app->staticEntities.size(); i++){
+			if (this != app->staticEntities[i]){
+				collidesWith(*(app->staticEntities[i]), true);
+			}
 		}
 	}
-	/*
-	x += velocity_x * elapsed;
-	y += velocity_y * elapsed;
-	matrix.identity();
-	matrix.Translate(x, y, 0);
-	*/
 }
 void Entity::move(float x_shift, float y_shift){
 	x += x_shift;
@@ -72,16 +72,17 @@ bool Entity::collidesWith(const Entity& other, bool applyShift){
 		float botIntersect = r2Top - r1Bottom;
 		float leftIntersect = r2Right - r1Left;
 		float rightIntersect = r1Right - r2Left;
-		
+
 		//if ( ! ( (r1Bottom > r2Top) || (r1Top < r2Bottom) || 
 		//	     (r1Left > r2Right) || (r1Right < r2Left) )  ){
 		if ((topIntersect > 0) && (botIntersect > 0) && (leftIntersect > 0) && (rightIntersect > 0))
 			if (applyShift){
 				float largestIntersect = fmin(topIntersect, fmin(botIntersect, fmin(leftIntersect, rightIntersect)));
 				float extra = 0.0001;
-				
+
 				if (largestIntersect == topIntersect){
 					move(0, -(topIntersect + extra));
+					velocity_y = 0;
 					collideTop = true;
 				}
 				else  if (largestIntersect == botIntersect){
@@ -102,7 +103,7 @@ bool Entity::collidesWith(const Entity& other, bool applyShift){
 			}
 		return true;
 	}
-	
+
 	return false;
 }
 //===================================================================================================================================
@@ -124,8 +125,8 @@ circleEntity::circleEntity(GameApp * app, SheetSprite& sprite, float x, float y)
 //===================================================================================================================================
 SheetSprite::SheetSprite(){}
 
-SheetSprite::SheetSprite(unsigned int textureID, float u, float v, float width, float height, float size) :
-textureID(textureID), u(u), v(v), u_width(width), v_height(height), size(size), height(size), width(size)
+SheetSprite::SheetSprite(unsigned int textureID, float u, float v, float u_w, float v_h, float h, float w) :
+textureID(textureID), u(u), v(v), u_width(u_w), v_height(v_h), size(size), height(h), width(w)
 {
 }
 void SheetSprite::draw(GameApp* app){
