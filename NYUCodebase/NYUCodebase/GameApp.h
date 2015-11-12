@@ -5,8 +5,9 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
-
 #include "ShaderProgram.h"
+#include <SDL_mixer.h>
+
 #include <vector>
 #include "Matrix.h"
 #include "Entity.h"
@@ -46,7 +47,8 @@ private:
 	bool done;
 	float lastFrameTicks;
 	SDL_Window*	displayWindow;
-
+	Mix_Music* music;
+	Mix_Chunk *sound;
 	Matrix projectionMatrix;
 	Matrix modelMatrix;
 	Matrix viewMatrix;

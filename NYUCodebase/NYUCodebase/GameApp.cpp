@@ -69,9 +69,15 @@ void GameApp::setup() {
 	entities.push_back(player);
 
 	loadMap();
+
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+	//music = Mix_LoadMUS("music.mp3");
+	//Mix_PlayMusic(music, -1);
+	
 }
 GameApp::~GameApp() {
 	// SDL and OpenGL cleanup (joysticks, textures, etc).
+	Mix_FreeMusic(music);
 	SDL_Quit();
 }
 void GameApp::Render() {
@@ -102,6 +108,9 @@ void GameApp::ProcessEvents() {
 		else if (event.type == SDL_KEYDOWN){
 			if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
 				player->velocity_y = 130;
+				Mix_FreeChunk(sound);
+				sound = Mix_LoadWAV("Jump.wav");
+				Mix_PlayChannel(-1, sound, 0);
 			}
 		}
 	}
