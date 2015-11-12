@@ -6,7 +6,7 @@ public:
 	SheetSprite();
 	SheetSprite(unsigned int textureID, float u, float v, float u_w, float v_h, float w, float h);
 
-	void draw(GameApp* app);
+	void draw(ShaderProgram *shader);
 
 	unsigned int textureID;
 	float u;
@@ -23,14 +23,14 @@ class Entity {
 	friend class GameApp;
 public:
 	Entity();
-	Entity(GameApp * app, SheetSprite& sprite, float x = 0.0f, float y = 0.0f);
+	Entity(ShaderProgram *shader, SheetSprite& sprite, float x = 0.0f, float y = 0.0f);
 	//~Entity();
 	void draw();
 	void update(float elapsed);
 	bool collidesWith(const Entity& other, bool applyShift = false);
 	void move(float xShift, float yShift);
 protected:
-	GameApp* app;
+	ShaderProgram *shader;
 	SheetSprite sprite;
 	Matrix matrix;  //stores the transformation for it's position in the world
 	float x, y;
@@ -51,7 +51,7 @@ protected:
 
 
 class circleEntity :public Entity{
-	circleEntity(GameApp * app, SheetSprite& sprite, float x = 0.0f, float y = 0.0f);
+	circleEntity(ShaderProgram *shader, SheetSprite& sprite, float x = 0.0f, float y = 0.0f);
 
 private:
 	float radius;

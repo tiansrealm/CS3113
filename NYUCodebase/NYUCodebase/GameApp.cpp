@@ -41,7 +41,7 @@ GLuint LoadTextureAlpha(const char *image_path){
 //=====================================================================================================================
 
 GameApp::GameApp() :
-done(false), lastFrameTicks(0.0f), displayWindow(nullptr), program(nullptr),
+done(false), lastFrameTicks(0.0f), displayWindow(nullptr), shader(nullptr),
 screenWidth(640), screenHeight(320){
 
 	setup();
@@ -57,14 +57,15 @@ void GameApp::setup() {
 #endif
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glViewport(0, 0, screenWidth, screenHeight);
-	program = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
+	shader = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
 	projectionMatrix.setOrthoProjection(-screenWidth / 4, screenWidth / 4, -screenHeight / 4, screenHeight / 4, -1.0f, 1.0f);
-	program->setProjectionMatrix(projectionMatrix);
-	program->setViewMatrix(viewMatrix);
-	glUseProgram(program->programID);
+	shader->setProjectionMatrix(projectionMatrix);
+	shader->setViewMatrix(viewMatrix);
+	glUseProgram(shader->programID);
 	GLuint playerTexture = LoadTextureAlpha("smiley.png");
-	player = new Entity(this, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 16.0f, 16.0f), 0, 0);
+	player = new Entity(shader, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 16.0f, 16.0f), 0, 0);
 	entities.push_back(player);
 
 	loadMap();
@@ -78,16 +79,16 @@ void GameApp::Render() {
 	glClearColor(0.4f, 0.2f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	for (size_t i = 0; i < entities.size(); i++) {
-		program->setModelMatrix(entities[i]->matrix);
+		shader->setModelMatrix(entities[i]->matrix);
 		entities[i]->draw();
 	}
 	for (size_t i = 0; i < staticEntities.size(); i++) {
-		program->setModelMatrix(staticEntities[i]->matrix);
+		shader->setModelMatrix(staticEntities[i]->matrix);
 		staticEntities[i]->draw();
 	}
 	viewMatrix.identity();
 	viewMatrix.Translate(-player->x, -player->y, 0);
-	program->setViewMatrix(viewMatrix);
+	shader->setViewMatrix(viewMatrix);
 	SDL_GL_SwapWindow(displayWindow);
 }
 void GameApp::ProcessEvents() {
@@ -115,12 +116,17 @@ void GameApp::ProcessEvents() {
 void GameApp::Update(float elapsed) {
 	// move things based on time passed
 	// check for collisions and respond to them
+
 	for (size_t i = 0; i < entities.size(); i++) {
 		entities[i]->update(elapsed);
+		for (size_t j = 0; j < staticEntities.size(); j++){
+			entities[i]->collidesWith(*(staticEntities[j]), true);
+		}
+
 	}
-	for (size_t i = 0; i < staticEntities.size(); i++) {
-		staticEntities[i]->update(elapsed);
-	}
+	//for (size_t i = 0; i < staticEntities.size(); i++) {
+	//	staticEntities[i]->update(elapsed);
+	//}
 }
 
 bool GameApp::updateAndRender() {
@@ -164,7 +170,7 @@ void GameApp::loadMap(){
 				SheetSprite tileSprite = SheetSprite(spriteSheetTexture, u, v, 16 / 256.0f, 16 / 128.0f, 16.0f, 16.0f);
 				float test = x * TILE_SIZE - screenWidth / 2;
 				float newX = x * 16 - screenWidth / 2;
-				Entity* tile = new Entity(this, tileSprite, newX, -y * 16 + screenHeight/2);
+				Entity* tile = new Entity(shader, tileSprite, newX, -y * 16 + screenHeight/2);
 				tile->is_static = true;
 				staticEntities.push_back(tile);
 			}
@@ -248,7 +254,7 @@ bool GameApp::readEntityData(std::ifstream &stream) {
 			string xPosition, yPosition;
 			getline(lineStream, xPosition, ',');
 			getline(lineStream, yPosition, ',');
-				float placeX = atoi(xPosition.c_str()) * 16 - screenWidth / 2;
+			float placeX = atoi(xPosition.c_str()) * 16 - screenWidth / 2;
 			float placeY = atoi(yPosition.c_str()) * -16 + screenHeight;
 			placeEntity(type, placeX, placeY);
 		}
@@ -259,6 +265,6 @@ bool GameApp::readEntityData(std::ifstream &stream) {
 void GameApp::placeEntity(string& type, float x, float y){
 	GLuint spriteSheetTexture = LoadTextureAlpha("arne_sprites.png");
 	SheetSprite enemySprite = SheetSprite(spriteSheetTexture, 0.0f, 5.0/8.0f, 16/256.0f, 16/128.0f, 16.0f, 16.0f);
-	Entity* enemy = new Entity(this, enemySprite, x , y );
+	Entity* enemy = new Entity(shader, enemySprite, x , y );
 	entities.push_back(enemy);
 }

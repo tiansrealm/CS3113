@@ -51,7 +51,7 @@ private:
 	Matrix modelMatrix;
 	Matrix viewMatrix;
 
-	ShaderProgram *program;
+	ShaderProgram *shader;
 	std::vector<Entity*> entities;
 	std::vector<Entity*> staticEntities;
 };

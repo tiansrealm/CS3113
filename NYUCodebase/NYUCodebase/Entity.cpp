@@ -10,8 +10,8 @@ bool circleCollison(float x1, float x2, float y1, float y2, float r1, float r2){
 }
 Entity::Entity(){}
 
-Entity::Entity(GameApp *app, SheetSprite& sprite, float x, float y) :
-app(app), sprite(sprite), x(x), y(y), velocity_x(0.0f), velocity_y(0.0f),
+Entity::Entity(ShaderProgram *shader, SheetSprite& sprite, float x, float y) :
+shader(shader), sprite(sprite), x(x), y(y), velocity_x(0.0f), velocity_y(0.0f),
 accel_x(0.0f), accel_y(0.0f), shape(RECTANGLE), is_static(false),
 collideTop(false), collideBot(false), collideLeft(false), collideRight(false)
 {
@@ -21,7 +21,7 @@ collideTop(false), collideBot(false), collideLeft(false), collideRight(false)
 	matrix.Translate(x, y, 0);
 }
 void Entity::draw(){
-	sprite.draw(app);
+	sprite.draw(shader);
 }
 
 void Entity::update(float elapsed){
@@ -44,18 +44,6 @@ void Entity::update(float elapsed){
 
 	move(velocity_x * elapsed, velocity_y * elapsed);
 
-	if (!is_static){
-		for (size_t i = 0; i < app->entities.size(); i++){
-			//if (this != app->entities[i]){
-			//	collidesWith(*(app->entities[i]), true);
-			//}
-		}
-		for (size_t i = 0; i < app->staticEntities.size(); i++){
-			if (this != app->staticEntities[i]){
-				collidesWith(*(app->staticEntities[i]), true);
-			}
-		}
-	}
 }
 void Entity::move(float x_shift, float y_shift){
 	x += x_shift;
@@ -108,16 +96,14 @@ bool Entity::collidesWith(const Entity& other, bool applyShift){
 }
 //===================================================================================================================================
 
-circleEntity::circleEntity(GameApp * app, SheetSprite& sprite, float x, float y)
-	: Entity(app, sprite, x, y)
+circleEntity::circleEntity(ShaderProgram *shader, SheetSprite& sprite, float x, float y)
+	: Entity(shader, sprite, x, y)
 {
 	if (sprite.width == sprite.height){
 		radius = sprite.width / 2;
 	}
 	else{ throw "need square spriteTexture for circle entity"; }
-
 	shape = CIRCLE;
-
 }
 
 
@@ -129,7 +115,7 @@ SheetSprite::SheetSprite(unsigned int textureID, float u, float v, float u_w, fl
 textureID(textureID), u(u), v(v), u_width(u_w), v_height(v_h), size(size), height(h), width(w)
 {
 }
-void SheetSprite::draw(GameApp* app){
+void SheetSprite::draw(ShaderProgram *shader){
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	GLfloat texCoords[] = {
 		u, v + v_height,
@@ -161,13 +147,13 @@ void SheetSprite::draw(GameApp* app){
 			0.5f * size * aspect, -0.5f * size
 			*/
 		};
-		glVertexAttribPointer(app->program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-		glEnableVertexAttribArray(app->program->positionAttribute);
-		glVertexAttribPointer(app->program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-		glEnableVertexAttribArray(app->program->texCoordAttribute);
+		glVertexAttribPointer(shader->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+		glEnableVertexAttribArray(shader->positionAttribute);
+		glVertexAttribPointer(shader->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+		glEnableVertexAttribArray(shader->texCoordAttribute);
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDisableVertexAttribArray(app->program->texCoordAttribute);
+		glDisableVertexAttribArray(shader->texCoordAttribute);
 		
 }
 
