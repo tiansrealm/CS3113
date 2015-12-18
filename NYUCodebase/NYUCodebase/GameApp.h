@@ -9,9 +9,12 @@
 #include <SDL_mixer.h>
 
 #include <vector>
+#include <string>
+#include <map>
 #include "Matrix.h"
 #include "Entity.h"
-#include <string>
+#include "Particle.h"
+
 #ifdef _WINDOWS
 #define RESOURCE_FOLDER ""
 #else
@@ -22,6 +25,8 @@
 
 
 class Entity;
+class ParticleEmitter;
+
 class GameApp{
 	friend class SheetSprite;
 	friend class Entity;
@@ -48,14 +53,15 @@ private:
 	float lastFrameTicks;
 	SDL_Window*	displayWindow;
 	Mix_Music* music;
-	Mix_Chunk *sound;
+	Mix_Chunk* sound;
 	Matrix projectionMatrix;
 	Matrix modelMatrix;
 	Matrix viewMatrix;
-
+	std::map<std::string, GLuint> textures;
 	ShaderProgram *shader;
 	std::vector<Entity*> entities;
 	std::vector<Entity*> staticEntities;
+	ParticleEmitter* emitter;
 };
 
 

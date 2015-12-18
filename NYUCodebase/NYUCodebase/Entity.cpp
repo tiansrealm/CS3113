@@ -29,7 +29,7 @@ void Entity::update(float elapsed){
 	float friction_y = 1.0;
 
 	//float gravity_x = 0 ;
-	float gravity_y = -9.81 * 10;
+	float gravity_y = -10.0f * 10;
 	if (!is_static){
 		velocity_y += gravity_y * elapsed;
 	}
@@ -112,11 +112,10 @@ circleEntity::circleEntity(ShaderProgram *shader, SheetSprite& sprite, float x, 
 SheetSprite::SheetSprite(){}
 
 SheetSprite::SheetSprite(unsigned int textureID, float u, float v, float u_w, float v_h, float h, float w) :
-textureID(textureID), u(u), v(v), u_width(u_w), v_height(v_h), size(size), height(h), width(w)
+textureID(textureID), u(u), v(v), u_width(u_w), v_height(v_h), height(h), width(w)
 {
 }
 void SheetSprite::draw(ShaderProgram *shader){
-	glBindTexture(GL_TEXTURE_2D, textureID);
 	GLfloat texCoords[] = {
 		u, v + v_height,
 		u + u_width, v,
@@ -146,14 +145,15 @@ void SheetSprite::draw(ShaderProgram *shader){
 			-0.5f * size * aspect, -0.5f * size,
 			0.5f * size * aspect, -0.5f * size
 			*/
-		};
-		glVertexAttribPointer(shader->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-		glEnableVertexAttribArray(shader->positionAttribute);
-		glVertexAttribPointer(shader->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-		glEnableVertexAttribArray(shader->texCoordAttribute);
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDisableVertexAttribArray(shader->texCoordAttribute);
+	};
+	glVertexAttribPointer(shader->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+	glEnableVertexAttribArray(shader->positionAttribute);
+	glVertexAttribPointer(shader->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+	glEnableVertexAttribArray(shader->texCoordAttribute);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDisableVertexAttribArray(shader->positionAttribute);
+	glDisableVertexAttribArray(shader->texCoordAttribute);
 		
 }
 

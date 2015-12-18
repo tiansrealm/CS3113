@@ -6,38 +6,8 @@
 
 using namespace std;
 
-
-GLuint LoadTexture(const char *image_path){
-	SDL_Surface *surface = IMG_Load(image_path);
-
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGB,
-		GL_UNSIGNED_BYTE, surface->pixels);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	SDL_FreeSurface(surface);
-
-	return textureID;
-}
-GLuint LoadTextureAlpha(const char *image_path){
-	SDL_Surface *surface = IMG_Load(image_path);
-
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, surface->pixels);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	SDL_FreeSurface(surface);
-
-	return textureID;
-}
-
+GLuint LoadTexture(const char *image_path);
+GLuint LoadTextureAlpha(const char *image_path);
 //=====================================================================================================================
 
 GameApp::GameApp() :
@@ -49,7 +19,7 @@ screenWidth(640), screenHeight(320){
 void GameApp::setup() {
 	// SDL and OpenGL initialization
 	SDL_Init(SDL_INIT_VIDEO);
-	displayWindow = SDL_CreateWindow("Tian's HW", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 360, SDL_WINDOW_OPENGL);
+	displayWindow = SDL_CreateWindow("Tian's HW", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
 	SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
 	SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
@@ -60,12 +30,17 @@ void GameApp::setup() {
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glViewport(0, 0, screenWidth, screenHeight);
 	shader = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-	projectionMatrix.setOrthoProjection(-screenWidth / 4, screenWidth / 4, -screenHeight / 4, screenHeight / 4, -1.0f, 1.0f);
+	projectionMatrix.setOrthoProjection(-screenWidth / 2, screenWidth / 2, -screenHeight / 2, screenHeight / 2, -1.0f, 1.0f);
+	//projectionMatrix.setOrthoProjection(-screenWidth / 4, screenWidth / 4, -screenHeight / 4, screenHeight / 4, -1.0f, 1.0f);
+	shader->setModelMatrix(modelMatrix);
 	shader->setProjectionMatrix(projectionMatrix);
 	shader->setViewMatrix(viewMatrix);
 	glUseProgram(shader->programID);
-	GLuint playerTexture = LoadTextureAlpha("smiley.png");
-	player = new Entity(shader, SheetSprite(playerTexture, 0.0f, 0.0f, 1.0f, 1.0f, 16.0f, 16.0f), 0, 0);
+
+	textures["playerTexture"] = LoadTextureAlpha("smiley.png");
+	textures["flameTexture"] = LoadTextureAlpha("FlameTest.png");
+	textures["playerTexture"] = LoadTextureAlpha("smiley.png");
+	player = new Entity(shader, SheetSprite(textures["playerTexture"], 0.0f, 0.0f, 1.0f, 1.0f, 16.0f, 16.0f), 0, 0);
 	entities.push_back(player);
 
 	loadMap();
@@ -73,8 +48,11 @@ void GameApp::setup() {
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 	music = Mix_LoadMUS("music.mp3");
 	//music = Mix_LoadMUS("music2.mp3");
-	Mix_PlayMusic(music, -1);
+	//Mix_PlayMusic(music, -1);
 	sound = Mix_LoadWAV("Jump.wav");
+
+	//test particles
+	emitter = new ParticleEmitter(10, textures["flameTexture"], shader);
 	
 }
 GameApp::~GameApp() {
@@ -82,24 +60,14 @@ GameApp::~GameApp() {
 	Mix_FreeMusic(music);
 	Mix_FreeChunk(sound);
 	SDL_Quit();
-}
-void GameApp::Render() {
-	// clear, render and swap the window
-	glClearColor(0.4f, 0.2f, 0.4f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
 	for (size_t i = 0; i < entities.size(); i++) {
-		shader->setModelMatrix(entities[i]->matrix);
-		entities[i]->draw();
+		delete entities[i];
 	}
 	for (size_t i = 0; i < staticEntities.size(); i++) {
-		shader->setModelMatrix(staticEntities[i]->matrix);
-		staticEntities[i]->draw();
+		delete staticEntities[i];
 	}
-	viewMatrix.identity();
-	viewMatrix.Translate(-player->x, -player->y, 0);
-	shader->setViewMatrix(viewMatrix);
-	SDL_GL_SwapWindow(displayWindow);
 }
+
 void GameApp::ProcessEvents() {
 	// check for input events
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
@@ -123,6 +91,28 @@ void GameApp::ProcessEvents() {
 		player->accel_x = 60;
 	}
 }
+
+void GameApp::Render() {
+	// clear, render and swap the window
+	glClearColor(0.4f, 0.2f, 0.4f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	for (size_t i = 0; i < entities.size(); i++) {
+		shader->setModelMatrix(entities[i]->matrix);
+		entities[i]->draw();
+	}
+	for (size_t i = 0; i < staticEntities.size(); i++) {
+		shader->setModelMatrix(staticEntities[i]->matrix);
+		staticEntities[i]->draw();
+	}
+	shader->setModelMatrix(modelMatrix);
+	emitter->render();
+
+	viewMatrix.identity();
+	viewMatrix.Translate(-player->x, -player->y, 0);
+	shader->setViewMatrix(viewMatrix);
+	SDL_GL_SwapWindow(displayWindow);
+}
+
 void GameApp::Update(float elapsed) {
 	// move things based on time passed
 	// check for collisions and respond to them
@@ -137,6 +127,9 @@ void GameApp::Update(float elapsed) {
 	//for (size_t i = 0; i < staticEntities.size(); i++) {
 	//	staticEntities[i]->update(elapsed);
 	//}
+
+	emitter->update(elapsed);
+
 }
 
 bool GameApp::updateAndRender() {
@@ -145,6 +138,7 @@ bool GameApp::updateAndRender() {
 	lastFrameTicks = ticks;
 	ProcessEvents();
 	Update(elapsed);
+	
 	Render();
 	return done;
 }
@@ -277,4 +271,37 @@ void GameApp::placeEntity(string& type, float x, float y){
 	SheetSprite enemySprite = SheetSprite(spriteSheetTexture, 0.0f, 5.0/8.0f, 16/256.0f, 16/128.0f, 16.0f, 16.0f);
 	Entity* enemy = new Entity(shader, enemySprite, x , y );
 	entities.push_back(enemy);
+}
+
+
+//==================================================================================
+GLuint LoadTexture(const char *image_path){
+	SDL_Surface *surface = IMG_Load(image_path);
+
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGB,
+		GL_UNSIGNED_BYTE, surface->pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	SDL_FreeSurface(surface);
+
+	return textureID;
+}
+GLuint LoadTextureAlpha(const char *image_path){
+	SDL_Surface *surface = IMG_Load(image_path);
+
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, surface->pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	SDL_FreeSurface(surface);
+
+	return textureID;
 }
