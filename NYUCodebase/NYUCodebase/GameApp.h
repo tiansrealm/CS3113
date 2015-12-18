@@ -1,17 +1,8 @@
 #pragma once
-#ifdef _WINDOWS
-#include <GL/glew.h>
-#endif
-#include <SDL.h>
-#include <SDL_opengl.h>
-#include <SDL_image.h>
-#include "ShaderProgram.h"
-#include <SDL_mixer.h>
 
-#include <vector>
-#include <string>
-#include <map>
+#include "Tools.h"
 #include "Matrix.h"
+#include "SheetSprite.h"
 #include "Entity.h"
 #include "Particle.h"
 
@@ -62,6 +53,7 @@ private:
 	std::vector<Entity*> entities;
 	std::vector<Entity*> staticEntities;
 	ParticleEmitter* emitter;
+	Entity* grid;
 };
 
 

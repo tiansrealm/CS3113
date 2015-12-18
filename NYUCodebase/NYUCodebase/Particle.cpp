@@ -1,6 +1,6 @@
 #include "Particle.h"
+#include "Tools.h"
 
-float lerp(float v0, float v1, float t);
 
 Color::Color() : r(0.0f), g(0.0f), b(0.0f), a(0.0f){}
 Vector::Vector() : x(0.0f), y(0.0f){}

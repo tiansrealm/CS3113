@@ -80,6 +80,8 @@
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="SheetSprite.cpp" />
+    <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
@@ -87,6 +89,8 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="SheetSprite.h" />
+    <ClInclude Include="Tools.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />

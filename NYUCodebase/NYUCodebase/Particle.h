@@ -1,20 +1,5 @@
 #pragma once
-#include <vector>
-#include "GameApp.h"
-struct Vector {
-	Vector::Vector();
-	Vector(float x, float y);
-	float x;
-	float y;
-};
-struct Color {
-	Color();
-	Color(float r, float g, float b, float a);
-	float r;
-	float g;
-	float b;
-	float a;
-};
+#include "Tools.h"
 
 class Particle { 
 public:  
