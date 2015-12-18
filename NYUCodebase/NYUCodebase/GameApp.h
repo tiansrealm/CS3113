@@ -1,10 +1,9 @@
 #pragma once
-
 #include "Tools.h"
-#include "Matrix.h"
 #include "SheetSprite.h"
 #include "Entity.h"
 #include "Particle.h"
+#include "GameState.h"
 
 #ifdef _WINDOWS
 #define RESOURCE_FOLDER ""
@@ -17,10 +16,13 @@
 
 class Entity;
 class ParticleEmitter;
+class GameState;
 
 class GameApp{
 	friend class SheetSprite;
 	friend class Entity;
+	friend class GameState;
+	friend class MapState;
 public:
 	GameApp();
 	~GameApp();
@@ -31,15 +33,8 @@ public:
 	void Update(float elapsed);
 	Entity* player; 
 
-	bool readHeader(std::ifstream &stream);
-	bool readLayerData(std::ifstream &stream);
-	bool readEntityData(std::ifstream &stream);
-	void loadMap();
-	void placeEntity(std::string& type, float x, float y);
 private:
 	int screenWidth, screenHeight;
-	int mapWidth, mapHeight;
-	unsigned char** mapData;
 	bool done;
 	float lastFrameTicks;
 	SDL_Window*	displayWindow;
@@ -48,11 +43,11 @@ private:
 	Matrix projectionMatrix;
 	Matrix modelMatrix;
 	Matrix viewMatrix;
+
 	std::map<std::string, GLuint> textures;
+	std::map<std::string, GameState*> gameStates;
+	GameState* currentState;
 	ShaderProgram *shader;
-	std::vector<Entity*> entities;
-	std::vector<Entity*> staticEntities;
-	ParticleEmitter* emitter;
 	Entity* grid;
 };
 

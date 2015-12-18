@@ -4,8 +4,8 @@
 class Particle { 
 public:  
 	Particle(Vector p, Vector v, float l, float sd, Color cd);
-	Vector position;         
-	Vector velocity;         
+	Vector pos;         
+	Vector vel;         
 	float lifetime; 
 	float sizeDeviation;
 	Color colorDeviation;
@@ -18,9 +18,9 @@ public:
 	void update(float elapsed);         
 	void render();
 	
-	Vector position;
-	Vector velocity;
-	Vector velocityDeviation;
+	Vector pos;
+	Vector vel;
+	Vector velDev;
 	Vector gravity;         
 	float maxLifetime;
 	float startSize;         

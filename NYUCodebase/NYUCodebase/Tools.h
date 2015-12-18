@@ -9,9 +9,13 @@
 #include "ShaderProgram.h"
 #include <SDL_mixer.h>
 
+#include "Matrix.h"
 #include <vector>
 #include <string>
 #include <map>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 struct Vector {
 	Vector::Vector();

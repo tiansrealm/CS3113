@@ -7,6 +7,8 @@
 enum EntityShape{RECTANGLE, CIRCLE};
 class Entity {
 	friend class GameApp;
+	friend class GameState;
+	friend class MapState;
 public:
 	Entity();
 	Entity(ShaderProgram *shader, SheetSprite* sprite, float x = 0.0f, float y = 0.0f);
@@ -36,7 +38,7 @@ protected:
 };
 
 
-class circleEntity :public Entity{
+class circleEntity: public Entity{
 	circleEntity(ShaderProgram *shader, SheetSprite* sprite, float x = 0.0f, float y = 0.0f);
 
 private:

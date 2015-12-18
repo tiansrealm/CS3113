@@ -10,14 +10,14 @@ Color::Color(float r, float g, float b, float a) :
 	r(r), g(g), b(b), a(a) {}
 
 Particle::Particle(Vector p, Vector v, float l, float sd, Color cd) : 
-	position(p), velocity(v), lifetime(l), sizeDeviation(sd), colorDeviation(cd) {}
+	pos(p), vel(v), lifetime(l), sizeDeviation(sd), colorDeviation(cd) {}
 
 ParticleEmitter::ParticleEmitter(){}
 ParticleEmitter::ParticleEmitter(unsigned int particleCount, unsigned int textureID, ShaderProgram *shader) 
 	: textureID(textureID), shader(shader) {
-	position = Vector(0.0f, 0.0f);
-	velocity = Vector(20.0f, 20.0f);
-	velocityDeviation = Vector(0.0f, 0.0f);
+	pos = Vector(0.0f, 0.0f);
+	vel = Vector(20.0f, 20.0f);
+	velDev = Vector(0.0f, 0.0f);
 	colorDeviation = Color(0.0f, 0.0f, 0.0f, 0.0f);
 	gravity = Vector(0.0f, -10.0f);
 	maxLifetime = 5.0f;
@@ -28,29 +28,29 @@ ParticleEmitter::ParticleEmitter(unsigned int particleCount, unsigned int textur
 	//initilize particles
 	for (int i = 0; i < particleCount; ++i) {
 		float randLifeTime = maxLifetime * ((float)rand() / (float)RAND_MAX);
-		float randVelocityX = velocity.x + velocityDeviation.x * ((float)rand() / (float)RAND_MAX);
-		float randVelocityY = velocity.y + velocityDeviation.y * ((float)rand() / (float)RAND_MAX);
-		Vector randVelocity = Vector(randVelocityX, randVelocityY);
+		float randvelX = vel.x + velDev.x * ((float)rand() / (float)RAND_MAX);
+		float randvelY = vel.y + velDev.y * ((float)rand() / (float)RAND_MAX);
+		Vector randvel = Vector(randvelX, randvelY);
 		float randSizeDev = maxSizeDeviation * ((float)rand() / (float)RAND_MAX);
 		float randR = colorDeviation.r * ((float)rand() / (float)RAND_MAX);
 		float randG = colorDeviation.g * ((float)rand() / (float)RAND_MAX);
 		float randB = colorDeviation.b * ((float)rand() / (float)RAND_MAX);
 		float randA = colorDeviation.a * ((float)rand() / (float)RAND_MAX);
 		Color randColorDev = Color(randR, randG, randB, randA);
-		particles.push_back(new Particle(position, randVelocity, randLifeTime, randSizeDev, randColorDev));
+		particles.push_back(new Particle(pos, randvel, randLifeTime, randSizeDev, randColorDev));
 
 	}
 }
 void ParticleEmitter::update(float elapsed){
 	for (int i = 0; i < particles.size(); i++) {
-		particles[i]->position.x += particles[i]->velocity.x * elapsed;
-		particles[i]->position.y += particles[i]->velocity.y * elapsed;
-		particles[i]->velocity.x += gravity.x * elapsed;
-		particles[i]->velocity.y += gravity.y * elapsed;
+		particles[i]->pos.x += particles[i]->vel.x * elapsed;
+		particles[i]->pos.y += particles[i]->vel.y * elapsed;
+		particles[i]->vel.x += gravity.x * elapsed;
+		particles[i]->vel.y += gravity.y * elapsed;
 		particles[i]->lifetime += elapsed;
 		if (particles[i]->lifetime >= maxLifetime){
-			particles[i]->position = position;
-			particles[i]->velocity = velocity;
+			particles[i]->pos = pos;
+			particles[i]->vel = vel;
 			particles[i]->lifetime = 0;
 		}
 	}
@@ -65,12 +65,12 @@ void ParticleEmitter::render(){
 		float size = lerp(startSize, endSize, m) + particles[i]->sizeDeviation;
 
 		vertices.insert(vertices.end(), {
-			particles[i]->position.x, particles[i]->position.y + size,
-			particles[i]->position.x, particles[i]->position.y,
-			particles[i]->position.x + size, particles[i]->position.y + size,
-			particles[i]->position.x + size, particles[i]->position.y + size,
-			particles[i]->position.x, particles[i]->position.y,
-			particles[i]->position.x + size, particles[i]->position.y 
+			particles[i]->pos.x, particles[i]->pos.y + size,
+			particles[i]->pos.x, particles[i]->pos.y,
+			particles[i]->pos.x + size, particles[i]->pos.y + size,
+			particles[i]->pos.x + size, particles[i]->pos.y + size,
+			particles[i]->pos.x, particles[i]->pos.y,
+			particles[i]->pos.x + size, particles[i]->pos.y 
 		});
 
 		texCoords.insert(texCoords.end(), {
