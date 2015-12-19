@@ -29,8 +29,9 @@ void GameState::render(){
 		shader->setModelMatrix(model);
 		emitters[i]->render();
 	}
-
 	
+	
+	app->displayText("Hello Tian", -100, 100, 16, 16, 2);
 }
 
 void GameState::update(float elapsed){

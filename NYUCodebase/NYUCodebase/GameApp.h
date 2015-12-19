@@ -45,10 +45,13 @@ private:
 	Matrix viewMatrix;
 
 	std::map<std::string, GLuint> textures;
+	std::map<std::string, SheetSprite*> sprites;
 	std::map<std::string, GameState*> gameStates;
 	GameState* currentState;
 	ShaderProgram *shader;
 	Entity* grid;
+	void loadFont();
+	void displayText(const std::string s, float x, float y, float w, float h, float spacing);
 };
 
 

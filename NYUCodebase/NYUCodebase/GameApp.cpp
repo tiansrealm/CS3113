@@ -36,12 +36,15 @@ void GameApp::setup() {
 	textures["player"] = LoadTextureAlpha("smiley.png");
 	textures["flame"] = LoadTextureAlpha("FlameTest.png");
 	textures["grid"] = LoadTextureAlpha("grid.png");
+	textures["font"] = LoadTextureAlpha("font.png");
 
+	loadFont();
 
 	currentState = new MapState("map1", this);
 	gameStates["map1"] = currentState;
 
-	player = new Entity(shader, new SheetSprite(textures["player"], 0.0f, 0.0f, 1.0f, 1.0f, 16.0f, 16.0f), 0, 50);
+	//player = new Entity(shader, new SheetSprite(textures["player"], 0.0f, 0.0f, 1.0f, 1.0f, 16.0f, 16.0f), 0, 50);
+	player = new Entity(shader, sprites["\""], 0, 50);
 	currentState->entities.push_back(player);
 
 	grid = new Entity(shader, new SheetSprite(textures["grid"], 0.0f, 0.0f, 1.0f, 1.0f, 640.0f, 480.0f), -320, 240.0f);
@@ -111,4 +114,36 @@ bool GameApp::updateAndRender() {
 	
 	Render();
 	return done;
+}
+
+void GameApp::loadFont(){
+	vector<string> symbols = {
+		" ", "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/",
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?",
+		"@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+		"P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_",
+		"`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+		"p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"
+	};
+
+	for(size_t i = 0; i < symbols.size(); ++i ){
+		int row = i / 16;
+		int col = i % 16;
+		sprites[symbols[i]] = new SheetSprite(textures["font"], row, col, 16, 16, 512, 192, 32, 32);
+	}
+}
+
+void GameApp::displayText(const string s, float x, float y, float w, float h, float spacing){
+	shader->setViewMatrix(Matrix());
+	Matrix model;
+	model.Translate(x, y, 0);
+	SheetSprite temp;
+	for (size_t i = 0; i < s.length(); i++){
+		temp = *sprites[s.substr(i, 1)];
+		temp.width = w;
+		temp.height = h;
+		shader->setModelMatrix(model);
+		temp.draw(shader);
+		model.Translate(w + spacing, 0, 0);
+	}
 }

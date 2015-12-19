@@ -1,6 +1,8 @@
 #include "Tools.h"
 
 
+Xywh::Xywh(float x, float y, float w, float h) : x(x), y(y), w(w), h(h){}
+
 float lerp(float v0, float v1, float t) {
 	return (1.0 - t)*v0 + t*v1;
 }

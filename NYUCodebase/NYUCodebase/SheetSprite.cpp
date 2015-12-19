@@ -6,6 +6,16 @@ SheetSprite::SheetSprite(unsigned int textureID, float u, float v, float u_w, fl
 textureID(textureID), u(u), v(v), u_width(u_w), v_height(v_h), width(w), height(h)
 {
 }
+SheetSprite::SheetSprite(unsigned int textureID, int row, int col, float w, float h, 
+	float totalWidth, float totalHeight, float subWidth, float subHeight) :
+textureID(textureID), width(w), height(h)
+{
+	//precondition: all sub sprites are same size
+	u = (col * subWidth / totalWidth);
+	v = (row * subHeight) / totalHeight;
+	u_width = subWidth / totalWidth;
+	v_height = subHeight / totalHeight;
+}
 void SheetSprite::draw(ShaderProgram *shader){
 	GLfloat texCoords[] = {
 		u, v + v_height,

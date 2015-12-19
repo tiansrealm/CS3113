@@ -17,8 +17,16 @@
 #include <iostream>
 #include <sstream>
 
+struct Xywh {
+	Xywh(float x = 0.0f, float y = 0.0f, float w = 0.0f, float h = 0.0f);
+	float x;
+	float y;
+	float w;
+	float h;
+};
+
 struct Vector {
-	Vector::Vector();
+	Vector();
 	Vector(float x, float y);
 	float x;
 	float y;
