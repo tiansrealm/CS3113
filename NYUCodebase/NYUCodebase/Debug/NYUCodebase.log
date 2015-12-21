@@ -1,33 +1,36 @@
-﻿Build started 12/21/2015 2:07:07 PM.
+﻿Build started 12/21/2015 3:13:15 PM.
      1>Project "C:\Users\Tian\Desktop\Tian\CS3113 projects\CS3113_Tian_HW\NYUCodebase\NYUCodebase\NYUCodebase.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\SDL2\include /IC:\SDL2_image\include /IC:\glew\include /IC:\SDL2_mixer\include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _WINDOWS /D _MBCS /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt GameApp.cpp
          GameApp.cpp
      1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.h(14): warning C4005: 'TILE_SIZE' : macro redefinition
                  c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gamestate.h(5) : see previous definition of 'TILE_SIZE'
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(112): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(115): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(116): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(150): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(153): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(158): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(163): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(166): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(222): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(349): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(354): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(358): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(361): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(364): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(369): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(372): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(29): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(66): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(67): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(123): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(126): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(127): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(161): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(164): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(169): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(174): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(177): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(240): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(370): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(375): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(379): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(384): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(387): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(382): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(385): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(390): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(394): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(393): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(396): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(400): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(405): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(408): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(411): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(415): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\tian\desktop\tian\cs3113 projects\cs3113_tian_hw\nyucodebase\nyucodebase\gameapp.cpp(417): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Tian\Desktop\Tian\CS3113 projects\CS3113_Tian_HW\NYUCodebase\Debug\NYUCodebase.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\SDL2_mixer\lib\x86 /LIBPATH:C:\SDL2\lib\x86 /LIBPATH:C:\SDL2_image\lib\x86 /LIBPATH:C:\glew\lib\Release\Win32 SDL2.lib SDL2_mixer.lib glew32.lib SDL2main.lib SDL2_image.lib OpenGL32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Tian\Desktop\Tian\CS3113 projects\CS3113_Tian_HW\NYUCodebase\Debug\NYUCodebase.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Tian\Desktop\Tian\CS3113 projects\CS3113_Tian_HW\NYUCodebase\Debug\NYUCodebase.lib" /MACHINE:X86 Debug\Entity.obj
          Debug\GameApp.obj
@@ -38,10 +41,9 @@
          Debug\ShaderProgram.obj
          Debug\SheetSprite.obj
          Debug\Tools.obj
-     1>MSVCRTD.lib(cinitexe.obj) : warning LNK4098: defaultlib 'msvcrt.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
          NYUCodebase.vcxproj -> C:\Users\Tian\Desktop\Tian\CS3113 projects\CS3113_Tian_HW\NYUCodebase\Debug\NYUCodebase.exe
      1>Done Building Project "C:\Users\Tian\Desktop\Tian\CS3113 projects\CS3113_Tian_HW\NYUCodebase\NYUCodebase\NYUCodebase.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:01.48
+Time Elapsed 00:00:01.42

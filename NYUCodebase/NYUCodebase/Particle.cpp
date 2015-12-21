@@ -74,7 +74,9 @@ void ParticleEmitter::update(float elapsed){
 		particles[i]->lifetime += elapsed;
 		if (particles[i]->lifetime >= maxLifetime){
 			particles[i]->pos = pos;
-			particles[i]->vel = vel;
+			float randvelX = vel.x + velDev.x * ((float)rand() / (float)RAND_MAX);
+			float randvelY = vel.y + velDev.y * ((float)rand() / (float)RAND_MAX);
+			particles[i]->vel = Vector(randvelX, randvelY);
 			particles[i]->lifetime = 0;
 		}
 	}

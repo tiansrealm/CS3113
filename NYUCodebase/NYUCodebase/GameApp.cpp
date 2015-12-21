@@ -26,7 +26,7 @@ void GameApp::setup() {
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	shader = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-	projectionMatrix.setOrthoProjection(-ORTHO_WIDTH / 2, ORTHO_WIDTH / 2, -ORTHO_HEIGHT / 2, ORTHO_HEIGHT / 2, -1.0f, 1.0f);
+	projectionMatrix.setOrthoProjection(-orthoWidth / 2, orthoWidth / 2, -orthoHeight / 2, orthoHeight / 2, -1.0f, 1.0f);
 	//projectionMatrix.setOrthoProjection(-SCREEN_WIDTH / 4, SCREEN_WIDTH / 4, -SCREEN_HEIGHT / 4, SCREEN_HEIGHT / 4, -1.0f, 1.0f);
 	shader->setModelMatrix(modelMatrix);
 	shader->setProjectionMatrix(projectionMatrix);
@@ -45,6 +45,7 @@ void GameApp::setup() {
 	textures["hpBar"]= LoadTextureAlpha("sprites/hpBar.png");
 	textures["portal"]= LoadTextureAlpha("sprites/portal.png");
 	textures["fireball"]= LoadTextureAlpha("sprites/fireball.png");
+	textures["raindrop"]= LoadTextureAlpha("sprites/raindrop.png");
 
 	textures["wizardStandR"]= LoadTextureAlpha("sprites/wizardStandRight.png");
 	textures["wizardJump R"]= LoadTextureAlpha("sprites/wizardJumpRight.png");
@@ -56,6 +57,15 @@ void GameApp::setup() {
 	textures["wizardHurt L"]= LoadTextureAlpha("sprites/wizardHurtLeft.png");
 	loadSprites();
 	starEmitter = new ParticleEmitter(25, textures["star7"], shader);
+	rainEmitter = new ParticleEmitter(1000, textures["raindrop"], shader);
+	rainEmitter->startSize = 12.0f;
+	rainEmitter->endSize = 8.0f;
+	rainEmitter->maxLifetime = 15.0f;
+	rainEmitter->velDev.x = 70;
+	rainEmitter->velDev.y = 30;
+	rainEmitter->pos.x = -orthoWidth/3;
+	rainEmitter->pos.y = orthoHeight*2/3;
+	rainEmitter->resetParticles(); 
 	fireballEmitter = new ParticleEmitter(30, textures["fireball"], shader);
 	fireballEmitter->startSize = 10.0f;
 	fireballEmitter->endSize = 40.0f;
@@ -81,6 +91,7 @@ void GameApp::setup() {
 	
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 	musics["jungle music"] = Mix_LoadMUS("sounds/jungle music.mp3");
+	musics["rain"] = Mix_LoadMUS("sounds/rain.mp3");
 	//music = Mix_LoadMUS("music2.mp3");
 	Mix_PlayMusic(musics["jungle music"], -1);
 	sounds["whoosh"] = Mix_LoadWAV("sounds/whoosh.wav");
@@ -178,6 +189,7 @@ void GameApp::ProcessEvents() {
 		}
 		if(state == "map2"){
 			if (player->collidesWith(*currentState->namedEntities["portal2"])){
+					Mix_PlayMusic(musics["rain"], -1);
 					nextState = gameStates["map3"];
 					player->setPos(50, 120);
 					player->vel.x = 0;
@@ -218,6 +230,12 @@ void GameApp::Render() {
 
 	viewMatrix.identity();
 	shader->setViewMatrix(viewMatrix);
+	if (currentState->name == "map3"){
+		Matrix model;
+		model.Translate(rainEmitter->pos.x, rainEmitter->pos.y, 0);
+		shader->setModelMatrix(model);
+		rainEmitter->render();
+	}
 	if (currentState->name.substr(0,3) == "map"){
 		displayText(to_string(player->hp), 180-orthoWidth/2,  400 - orthoHeight/2, 16, 16, 10);
 	}
@@ -244,6 +262,9 @@ void GameApp::Update(float elapsed) {
 	}
 	player->sprite = sprites[sprite + action + orientation];
 
+	if (currentState->name == "map3"){
+		rainEmitter->update(elapsed);
+	}
 }
 
 bool GameApp::updateAndRender() {
@@ -437,6 +458,9 @@ void GameApp::loadStates(){
 	
 	for(auto& iter : gameStates){
 		iter.second->emitters.push_back(starEmitter);
+	}
+	for (int i = 0; i < 120; ++i){
+		rainEmitter->update(.1f);
 	}
 	//currentState->emitters.push_back(new ParticleEmitter(10, textures["flame"], shader));
 }

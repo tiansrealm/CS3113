@@ -55,6 +55,7 @@ private:
 	Entity* cursor;
 	ParticleEmitter* starEmitter;
 	ParticleEmitter* fireballEmitter;
+	ParticleEmitter* rainEmitter;
 	void displayText(const std::string s, float x, float y, float w, float h, float spacing);
 	void loadSprites();
 	void loadStates();
