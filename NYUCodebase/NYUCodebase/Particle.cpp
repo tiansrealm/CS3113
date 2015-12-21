@@ -13,15 +13,16 @@ Particle::Particle(Vector p, Vector v, float l, float sd, Color cd) :
 	pos(p), vel(v), lifetime(l), sizeDeviation(sd), colorDeviation(cd) {}
 
 ParticleEmitter::ParticleEmitter(){}
-ParticleEmitter::ParticleEmitter(unsigned int particleCount, unsigned int textureID, ShaderProgram *shader) 
+ParticleEmitter::ParticleEmitter(unsigned int particleCount, unsigned int textureID, ShaderProgram *shader,
+	float x, float y) 
 	: textureID(textureID), shader(shader) {
-	pos = Vector(0.0f, 0.0f);
-	vel = Vector(20.0f, 20.0f);
+	pos = Vector(x, y);
+	vel = Vector(0.0f, -10.0f);
 	velDev = Vector(0.0f, 0.0f);
 	colorDeviation = Color(0.0f, 0.0f, 0.0f, 0.0f);
 	gravity = Vector(0.0f, -10.0f);
-	maxLifetime = 5.0f;
-	startSize = 10.0f;
+	maxLifetime = 2.0f;
+	startSize = 20.0f;
 	endSize = 0.0f;
 	maxSizeDeviation = 2.0f;
 	

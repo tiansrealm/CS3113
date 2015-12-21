@@ -38,8 +38,6 @@ private:
 	int orthoHeight, orthoWidth;
 	float lastFrameTicks;
 	SDL_Window*	displayWindow;
-	Mix_Music* music;
-	Mix_Chunk* sound;
 
 	Matrix projectionMatrix;
 	Matrix modelMatrix;
@@ -48,12 +46,13 @@ private:
 	std::map<std::string, GLuint> textures;
 	std::map<std::string, SheetSprite*> sprites;
 	std::map<std::string, GameState*> gameStates;
-
+	std::map<std::string, Mix_Chunk*> sounds;
+	std::map<std::string, Mix_Music*> musics;
 	GameState* currentState;
 	ShaderProgram *shader;
 	Entity* grid;
 	Entity* cursor;
-
+	ParticleEmitter* starEmitter;
 	void displayText(const std::string s, float x, float y, float w, float h, float spacing);
 	void loadSprites();
 	void loadStates();

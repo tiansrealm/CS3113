@@ -13,25 +13,31 @@ void GameState::render(){
 
 	setView();
 
-	for (size_t i = 0; i < entities.size(); ++i) {
-		app->shader->setModelMatrix(entities[i]->matrix);
+	for (size_t i = 0; i < entities.size(); ++i){
+		Matrix model = entities[i]->matrix;
+		//model.Rotate(entities[i]->rotation);
+		shader->setModelMatrix(model);
 		entities[i]->draw();
 	}
 	for (size_t i = 0; i < staticEntities.size(); ++i) {
-		shader->setModelMatrix(staticEntities[i]->matrix);
+		Matrix model = staticEntities[i]->matrix;
+		shader->setModelMatrix(model);
 		staticEntities[i]->draw();
 	}
-	for (const auto & i : ghostEntities)
-	{
-		shader->setModelMatrix(i.second->matrix);
-		i.second->draw();
-	}
+
+	
+	shader->setViewMatrix(Matrix());
 	Matrix model;
 	for (size_t i = 0; i < emitters.size(); ++i){
 		model.identity();
 		model.Translate(emitters[i]->pos.x, emitters[i]->pos.y, 0);
 		shader->setModelMatrix(model);
 		emitters[i]->render();
+	}
+	for (const auto & i : ghostEntities)
+	{
+		shader->setModelMatrix(i.second->matrix);
+		i.second->draw();
 	}
 	for (TextData td : textDatas){
 		app->displayText(td.text, td.x, td.y, td.font_w, td.font_h, td.spacing);
@@ -45,12 +51,26 @@ void GameState::update(float elapsed){
 		for (size_t j = 0; j < staticEntities.size(); j++){
 			entities[i]->collidesWith(*(staticEntities[j]), true);
 		}
+		if(entities[i]->hp <= 0){
+			entitiesToRemove.insert(i);
+		}
 	}
 	//for (size_t i = 0; i < staticEntities.size(); i++) {
 	//	staticEntities[i]->update(elapsed);
 	//}
 	for (size_t i = 0; i < emitters.size(); ++i){
 		emitters[i]->update(elapsed);
+	}
+
+	for (int i : entitiesToRemove){
+		delete entities[i];
+		entities.erase(entities.begin() + i);
+	}
+
+	if(name == "map1"){
+		app->player->rotation += 1*PI/180;
+		ghostEntities["hpBar"]->setWidthHeight(
+			app->player->hp / 10 * 36, ghostEntities["hpBar"]->height);
 	}
 }
 void GameState::setView(){
@@ -76,7 +96,16 @@ void MapState::setView(){
 }
 //=======================================================================
 void MapState::loadMap(){
-	ifstream infile("tileMap.txt");
+	ifstream infile;{
+		if(name == "map1"){
+			infile = ifstream("tileMap.txt");
+		}else if (name == "map2"){
+			infile = ifstream("tileMap2.txt");
+		}
+		else if (name == "map3"){
+			infile = ifstream("tileMap3.txt");
+		}
+	}
 	string line;
 	while (getline(infile, line)) {
 		if (line == "[header]") {

@@ -11,11 +11,16 @@
 
 #include "Matrix.h"
 #include <vector>
+#include <set>
+#include <functional>
 #include <string>
 #include <map>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+
+#define PI 3.1415926f
 
 struct Xywh {
 	Xywh(float x = 0.0f, float y = 0.0f, float w = 0.0f, float h = 0.0f);

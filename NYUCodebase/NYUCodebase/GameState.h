@@ -32,8 +32,9 @@ protected:
 	std::vector<TextData> textDatas;
 	std::vector<Entity*> entities;
 	std::vector<Entity*> staticEntities;
-
 	std::map<std::string, Entity*> ghostEntities;
+	std::map<std::string, Entity*> namedEntities;
+	std::set<int, std::greater<int>> entitiesToRemove;
 	std::vector<ParticleEmitter*> emitters;
 };
 

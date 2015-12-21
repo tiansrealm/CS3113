@@ -1,7 +1,6 @@
 #pragma once
 #include "ShaderProgram.h"
 
-
 class SheetSprite{
 public:
 	SheetSprite();
@@ -15,6 +14,6 @@ public:
 	float u_width;
 	float v_height;
 	float width;
-	float height;
+	float height; 
 };
 

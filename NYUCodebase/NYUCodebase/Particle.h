@@ -13,7 +13,7 @@ public:
 
 class ParticleEmitter { 
 public:         
-	ParticleEmitter(unsigned int particleCount, unsigned int textureID, ShaderProgram *shader);
+	ParticleEmitter(unsigned int particleCount, unsigned int textureID, ShaderProgram *shader, float x = 0, float y = 0);
 	ParticleEmitter();                   
 	void update(float elapsed);         
 	void render();

@@ -15,6 +15,10 @@ collideTop(false), collideBot(false), collideLeft(false), collideRight(false)
 	width = sprite->width;
 	matrix.identity();
 	matrix.Translate(x, y, 0);
+	hp = 1;
+	name = "none";
+	rotation = 0.0f;
+	aniTime = 0;
 }
 void Entity::draw(){
 	sprite->width = width;
@@ -33,7 +37,7 @@ void Entity::setPos(float x, float y){
 	matrix.Translate(x, y, 0);
 }
 void Entity::update(float elapsed){
-
+	collideTop = collideBot = collideRight = collideLeft = false;
 
 	if (!is_static){
 		float friction_x = 1.0;
@@ -49,6 +53,7 @@ void Entity::update(float elapsed){
 		accel.x = lerp(accel.x, 0.0f, elapsed *  friction_x);
 		vel.x += accel.x * elapsed;
 		vel.y += accel.y * elapsed;
+
 	}
 
 }
@@ -74,10 +79,10 @@ bool Entity::collidesWith(const Entity& other, bool applyShift){
 
 		//if ( ! ( (r1Bottom > r2Top) || (r1Top < r2Bottom) || 
 		//	     (r1Left > r2Right) || (r1Right < r2Left) )  ){
-		if ((topIntersect > 0) && (botIntersect > 0) && (leftIntersect > 0) && (rightIntersect > 0))
+		if ((topIntersect >= 0) && (botIntersect >= 0) && (leftIntersect >= 0) && (rightIntersect >= 0)){
 			if (applyShift){
 				float largestIntersect = fmin(topIntersect, fmin(botIntersect, fmin(leftIntersect, rightIntersect)));
-				float extra = 0.0001;
+				float extra = 0.0;
 
 				if (largestIntersect == topIntersect){
 					move(0, -(topIntersect + extra));
@@ -100,9 +105,10 @@ bool Entity::collidesWith(const Entity& other, bool applyShift){
 					collideRight = true;
 				}
 			}
-		return true;
+			
+			return true;
+		}
 	}
-
 	return false;
 }
 //===================================================================================================================================
