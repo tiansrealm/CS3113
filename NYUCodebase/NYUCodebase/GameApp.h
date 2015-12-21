@@ -37,6 +37,7 @@ private:
 	bool done;
 	int orthoHeight, orthoWidth;
 	float lastFrameTicks;
+	float aniTime;
 	SDL_Window*	displayWindow;
 
 	Matrix projectionMatrix;
@@ -53,6 +54,7 @@ private:
 	Entity* grid;
 	Entity* cursor;
 	ParticleEmitter* starEmitter;
+	ParticleEmitter* fireballEmitter;
 	void displayText(const std::string s, float x, float y, float w, float h, float spacing);
 	void loadSprites();
 	void loadStates();

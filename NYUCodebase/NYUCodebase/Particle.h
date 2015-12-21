@@ -17,7 +17,9 @@ public:
 	ParticleEmitter();                   
 	void update(float elapsed);         
 	void render();
-	
+	void resetParticles();
+
+	bool is_on;
 	Vector pos;
 	Vector vel;
 	Vector velDev;
@@ -26,6 +28,7 @@ public:
 	float startSize;         
 	float endSize;         
 	float maxSizeDeviation;
+	unsigned int pCount;
 	Color startColor;
 	Color endColor;
 	Color colorDeviation;

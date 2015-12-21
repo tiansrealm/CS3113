@@ -82,7 +82,7 @@ bool Entity::collidesWith(const Entity& other, bool applyShift){
 		if ((topIntersect >= 0) && (botIntersect >= 0) && (leftIntersect >= 0) && (rightIntersect >= 0)){
 			if (applyShift){
 				float largestIntersect = fmin(topIntersect, fmin(botIntersect, fmin(leftIntersect, rightIntersect)));
-				float extra = 0.0;
+				float extra = 0.0001;
 
 				if (largestIntersect == topIntersect){
 					move(0, -(topIntersect + extra));

@@ -24,15 +24,36 @@ void GameState::render(){
 		shader->setModelMatrix(model);
 		staticEntities[i]->draw();
 	}
-
 	
+	Matrix viewMatrix;
+	float x = app->player->pos.x;
+	float y = app->player->pos.y;
+	if(x < app->orthoWidth/2){
+		x = app->orthoWidth/2;
+	}
+	if(y < app->orthoHeight/2){
+		y = app->orthoHeight/2;
+	}
+	viewMatrix.Translate(-x, -y, 0);
+	shader->setViewMatrix(viewMatrix);
+	
+	if(app->fireballEmitter->is_on){
+		Matrix model;
+		model.Translate(app->fireballEmitter->pos.x, app->fireballEmitter->pos.y, 0);
+		shader->setModelMatrix(model);
+		app->fireballEmitter->render();
+	}
 	shader->setViewMatrix(Matrix());
+
+
 	Matrix model;
 	for (size_t i = 0; i < emitters.size(); ++i){
-		model.identity();
-		model.Translate(emitters[i]->pos.x, emitters[i]->pos.y, 0);
-		shader->setModelMatrix(model);
-		emitters[i]->render();
+		if(emitters[i]->is_on){
+			model.identity();
+			model.Translate(emitters[i]->pos.x, emitters[i]->pos.y, 0);
+			shader->setModelMatrix(model);
+			emitters[i]->render();
+		}
 	}
 	for (const auto & i : ghostEntities)
 	{
@@ -46,6 +67,7 @@ void GameState::render(){
 void GameState::update(float elapsed){
 	// move things based on time passed
 	// check for collisions and respond to them
+
 	for (size_t i = 0; i < entities.size(); i++) {
 		entities[i]->update(elapsed);
 		for (size_t j = 0; j < staticEntities.size(); j++){
@@ -59,12 +81,23 @@ void GameState::update(float elapsed){
 	//	staticEntities[i]->update(elapsed);
 	//}
 	for (size_t i = 0; i < emitters.size(); ++i){
-		emitters[i]->update(elapsed);
+		if(emitters[i]->is_on){
+			emitters[i]->update(elapsed);
+		}
 	}
 
 	for (int i : entitiesToRemove){
 		delete entities[i];
 		entities.erase(entities.begin() + i);
+	}
+
+	if(app->fireballEmitter->is_on){
+		app->fireballEmitter->update(elapsed);
+		app->aniTime += elapsed;
+		if(app->aniTime >= 1.5f){
+			app->fireballEmitter->is_on = false;
+			app->aniTime = 0.0f;
+		}
 	}
 
 	if(name == "map1"){

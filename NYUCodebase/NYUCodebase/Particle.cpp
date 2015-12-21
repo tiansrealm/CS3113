@@ -21,13 +21,36 @@ ParticleEmitter::ParticleEmitter(unsigned int particleCount, unsigned int textur
 	velDev = Vector(0.0f, 0.0f);
 	colorDeviation = Color(0.0f, 0.0f, 0.0f, 0.0f);
 	gravity = Vector(0.0f, -10.0f);
-	maxLifetime = 2.0f;
+	maxLifetime = 1.5f;
 	startSize = 20.0f;
 	endSize = 0.0f;
 	maxSizeDeviation = 2.0f;
-	
+	pCount = particleCount;
+	is_on = true;
 	//initilize particles
 	for (int i = 0; i < particleCount; ++i) {
+		float randLifeTime = maxLifetime * ((float)rand() / (float)RAND_MAX);
+		float randvelX = vel.x + velDev.x * ((float)rand() / (float)RAND_MAX);
+		float randvelY = vel.y + velDev.y * ((float)rand() / (float)RAND_MAX);
+		Vector randvel = Vector(randvelX, randvelY);
+		float randSizeDev = maxSizeDeviation * ((float)rand() / (float)RAND_MAX);
+		float randR = colorDeviation.r * ((float)rand() / (float)RAND_MAX);
+		float randG = colorDeviation.g * ((float)rand() / (float)RAND_MAX);
+		float randB = colorDeviation.b * ((float)rand() / (float)RAND_MAX);
+		float randA = colorDeviation.a * ((float)rand() / (float)RAND_MAX);
+		Color randColorDev = Color(randR, randG, randB, randA);
+		particles.push_back(new Particle(pos, randvel, randLifeTime, randSizeDev, randColorDev));
+
+	}
+}
+void ParticleEmitter::resetParticles(){
+	for(size_t i = 0; i < particles.size(); ++i){
+		delete particles[i];
+	}
+	particles.clear();
+
+	//initilize particles
+	for (int i = 0; i < pCount; ++i) {
 		float randLifeTime = maxLifetime * ((float)rand() / (float)RAND_MAX);
 		float randvelX = vel.x + velDev.x * ((float)rand() / (float)RAND_MAX);
 		float randvelY = vel.y + velDev.y * ((float)rand() / (float)RAND_MAX);

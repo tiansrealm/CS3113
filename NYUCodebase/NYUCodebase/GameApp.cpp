@@ -33,6 +33,8 @@ void GameApp::setup() {
 	shader->setViewMatrix(viewMatrix);
 	glUseProgram(shader->programID);
 
+	aniTime = 0.0f;
+
 	textures["player"] = LoadTextureAlpha("sprites/smiley.png");
 	textures["flame"] = LoadTextureAlpha("sprites/FlameTest.png");
 	textures["grid"] = LoadTextureAlpha("sprites/grid.png");
@@ -42,7 +44,7 @@ void GameApp::setup() {
 	textures["tileMap"]= LoadTextureAlpha("sprites/tileMap.png");
 	textures["hpBar"]= LoadTextureAlpha("sprites/hpBar.png");
 	textures["portal"]= LoadTextureAlpha("sprites/portal.png");
-	textures["fireBall"]= LoadTextureAlpha("sprites/fireball_sheet.png");
+	textures["fireball"]= LoadTextureAlpha("sprites/fireball.png");
 
 	textures["wizardStandR"]= LoadTextureAlpha("sprites/wizardStandRight.png");
 	textures["wizardJump R"]= LoadTextureAlpha("sprites/wizardJumpRight.png");
@@ -53,11 +55,21 @@ void GameApp::setup() {
 	textures["wizardAtt  L"]= LoadTextureAlpha("sprites/wizardAttLeft.png");
 	textures["wizardHurt L"]= LoadTextureAlpha("sprites/wizardHurtLeft.png");
 	loadSprites();
-	starEmitter = new ParticleEmitter(20, textures["star7"], shader);
+	starEmitter = new ParticleEmitter(25, textures["star7"], shader);
+	fireballEmitter = new ParticleEmitter(30, textures["fireball"], shader);
+	fireballEmitter->startSize = 10.0f;
+	fireballEmitter->endSize = 40.0f;
+	fireballEmitter->maxLifetime = 3.0f;
+	fireballEmitter->is_on = false;
+	fireballEmitter->gravity.y = 0.0f;
+	fireballEmitter->vel.x = 100.0;
+	fireballEmitter->vel.y = 0.0f;
+	fireballEmitter->resetParticles();
 
 	cursor = new Entity(shader, sprites["star7"], 0, 0, false);
 	player = new Entity(shader, sprites["wizardStandR"], 50, 100, false);
 	player->hp = 100;
+
 
 	
 	loadStates();
@@ -102,6 +114,15 @@ void GameApp::ProcessEvents() {
 	GameState* nextState = currentState;
 	starEmitter->pos.x = mouseX/2;
 	starEmitter->pos.y = mouseY/2 - 20;
+	fireballEmitter->vel.x = 70.0;
+	fireballEmitter->pos.x = player->pos.x/2 + player->width/2;
+	if(player->vel.x < 0){
+		fireballEmitter->pos.x = player->pos.x/2 - player->width/2;
+		fireballEmitter->vel.x = -70.0;
+		//fireballEmitter->textureID = textures["fireball_left"];
+	}
+	fireballEmitter->pos.y = player->pos.y/2 - player->height/4;
+	
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
 			done = true;
@@ -113,6 +134,14 @@ void GameApp::ProcessEvents() {
 						player->vel.y = 160; 
 						Mix_PlayChannel(-1, sounds["whoosh"], 0);
 					}
+				}
+			}
+
+
+			if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+				if(state.substr(0,3) == "map" && aniTime == 0){
+					fireballEmitter->is_on = true;
+					fireballEmitter->resetParticles();
 				}
 			}
 		}
@@ -210,6 +239,9 @@ void GameApp::Update(float elapsed) {
 	}else{
 		action = "Jump ";
 	}
+	if(aniTime > 0){
+		action = "Att  ";
+	}
 	player->sprite = sprites[sprite + action + orientation];
 
 }
@@ -274,7 +306,7 @@ void GameApp::loadSprites(){
 	sprites["button"] = new SheetSprite(textures["button"], 0.0f, 0.0f, 1.0f, 1.0f, 60.0f, 23.0f);
 	sprites["star7"] = new SheetSprite(textures["star7"], 0.0f, 0.0f, 1.0f, 1.0f, 32.0f, 32.0f);
 	sprites["portal"] = new SheetSprite(textures["portal"], 0.0f, 0.0f, 1.0f, 1.0f, 64.0f, 100.0f);
-	sprites["fireBall"] = new SheetSprite(textures["fireball_sheet"], 0.0f, 176.0f/300.0f, 64.0f/300.0f, 48.0f/300.f, 64.0f, 48.0f);
+	sprites["fireball"] = new SheetSprite(textures["fireball_sheet"], 0.0f, 0.0f, 1.0f, 1.0f, 94.0f, 60.0f);
 
 
 	sprites["wizardStandR"] = new SheetSprite(textures["wizardStandR"], 0.0f, 0.0f, 1.0f, 1.0f, 48.0f, 48.0f);
@@ -321,6 +353,12 @@ void GameApp::loadStates(){
 		TextData("HP: ", 
 			40-orthoWidth/2,  440 - orthoHeight/2, 36, 36));
 
+	gameStates["map1"]->textDatas.push_back(
+		TextData("Arrows Key to move. Space to Fire.", 
+			40-orthoWidth/2,  350 - orthoHeight/2, 16, 16));
+	gameStates["map1"]->textDatas.push_back(
+		TextData("Reach the portal to advance.", 
+			40-orthoWidth/2,  330 - orthoHeight/2, 16, 16));
 	gameStates["map2"]->textDatas.push_back(
 		TextData("Pause",
 			475-orthoWidth/2,  434 - orthoHeight/2, 16, 16));
@@ -328,8 +366,13 @@ void GameApp::loadStates(){
 
 	gameStates["map2"]->textDatas.push_back(
 		TextData("HP: ", 
-			40-orthoWidth/2,  440 - orthoHeight/2, 36, 36));
-
+			40-orthoWidth/2,  440 - orthoHeight/2, 36, 36));	
+	gameStates["map2"]->textDatas.push_back(
+		TextData("Arrows Key to move. Space to Fire.", 
+			40-orthoWidth/2,  350 - orthoHeight/2, 16, 16));
+	gameStates["map2"]->textDatas.push_back(
+		TextData("Reach the portal to advance.", 
+			40-orthoWidth/2,  330 - orthoHeight/2, 16, 16));
 
 	gameStates["map3"]->textDatas.push_back(
 		TextData("Pause",
@@ -339,7 +382,12 @@ void GameApp::loadStates(){
 	gameStates["map3"]->textDatas.push_back(
 		TextData("HP: ", 
 			40-orthoWidth/2,  440 - orthoHeight/2, 36, 36));
-
+	gameStates["map3"]->textDatas.push_back(
+		TextData("Arrows Key to move. Space to Fire.", 
+			40-orthoWidth/2,  350 - orthoHeight/2, 16, 16));
+	gameStates["map3"]->textDatas.push_back(
+		TextData("Reach the portal to win.", 
+			40-orthoWidth/2,  330 - orthoHeight/2, 16, 16));
 
 	Entity* hpBar = new Entity( shader, 
 		new SheetSprite(textures["hpBar"], 0.0f, 0.0f, 1.0f, 1.0f, 360.0f, 36.0f)
