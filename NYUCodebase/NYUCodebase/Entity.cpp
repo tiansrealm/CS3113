@@ -5,27 +5,43 @@
 
 Entity::Entity(){}
 
-Entity::Entity(ShaderProgram *shader, SheetSprite* sprite, float x, float y) :
+Entity::Entity(ShaderProgram *shader, SheetSprite* sprite, float x, float y, bool is_static) :
 shader(shader), sprite(sprite), pos(Vector(x,y)), vel(Vector(0.0f,0.0f)),
-accel(Vector(0.0f,0.0f)), shape(RECTANGLE), is_static(false),
+accel(Vector(0.0f,0.0f)), shape(RECTANGLE), is_static(is_static),
 collideTop(false), collideBot(false), collideLeft(false), collideRight(false)
 {
+
 	height = sprite->height;
 	width = sprite->width;
 	matrix.identity();
 	matrix.Translate(x, y, 0);
 }
 void Entity::draw(){
+	sprite->width = width;
+	sprite->height = height;
 	sprite->draw(shader);
 }
 
+void Entity::setWidthHeight(float w, float h){
+	width = w;
+	height = h;
+}
+void Entity::setPos(float x, float y){
+	pos.x = x;
+	pos.y = y;
+	matrix.identity();
+	matrix.Translate(x, y, 0);
+}
 void Entity::update(float elapsed){
-	float friction_x = 1.0;
-	float friction_y = 1.0;
 
-	//float gravity_x = 0 ;
-	float gravity_y = -10.0f * 10;
+
 	if (!is_static){
+		float friction_x = 1.0;
+		float friction_y = 1.0;
+
+		//float gravity_x = 0 ;
+		float gravity_y = -10.0f * 10;
+
 		vel.y += gravity_y * elapsed;
 		move(vel.x * elapsed, vel.y * elapsed);
 		vel.x = lerp(vel.x, 0.0f, elapsed * friction_x);
@@ -40,6 +56,10 @@ void Entity::move(float x_shift, float y_shift){
 	pos.x += x_shift;
 	pos.y += y_shift;
 	matrix.Translate(x_shift, y_shift, 0);
+}
+bool Entity::collidesWith(int x, int y){
+
+	return (x >= pos.x && x <= pos.x + width && y <= pos.y && y >= pos.y - height);
 }
 bool Entity::collidesWith(const Entity& other, bool applyShift){
 	if (shape == RECTANGLE && other.shape == RECTANGLE){

@@ -34,12 +34,13 @@ public:
 	Entity* player; 
 
 private:
-	int screenWidth, screenHeight;
 	bool done;
+	int orthoHeight, orthoWidth;
 	float lastFrameTicks;
 	SDL_Window*	displayWindow;
 	Mix_Music* music;
 	Mix_Chunk* sound;
+
 	Matrix projectionMatrix;
 	Matrix modelMatrix;
 	Matrix viewMatrix;
@@ -47,11 +48,16 @@ private:
 	std::map<std::string, GLuint> textures;
 	std::map<std::string, SheetSprite*> sprites;
 	std::map<std::string, GameState*> gameStates;
+
 	GameState* currentState;
 	ShaderProgram *shader;
 	Entity* grid;
-	void loadFont();
+	Entity* cursor;
+
 	void displayText(const std::string s, float x, float y, float w, float h, float spacing);
+	void loadSprites();
+	void loadStates();
+	
 };
 
 
