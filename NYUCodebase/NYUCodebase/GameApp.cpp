@@ -46,6 +46,8 @@ void GameApp::setup() {
 	textures["portal"]= LoadTextureAlpha("sprites/portal.png");
 	textures["fireball"]= LoadTextureAlpha("sprites/fireball.png");
 	textures["raindrop"]= LoadTextureAlpha("sprites/raindrop.png");
+	textures["enemy"]= LoadTextureAlpha("sprites/enemy.png");
+	textures["background"]= LoadTexture("sprites/background.png");
 
 	textures["wizardStandR"]= LoadTextureAlpha("sprites/wizardStandRight.png");
 	textures["wizardJump R"]= LoadTextureAlpha("sprites/wizardJumpRight.png");
@@ -72,7 +74,7 @@ void GameApp::setup() {
 	fireballEmitter->maxLifetime = 3.0f;
 	fireballEmitter->is_on = false;
 	fireballEmitter->gravity.y = 0.0f;
-	fireballEmitter->vel.x = 100.0;
+	fireballEmitter->vel.x = 80.0;
 	fireballEmitter->vel.y = 0.0f;
 	fireballEmitter->resetParticles();
 
@@ -125,10 +127,10 @@ void GameApp::ProcessEvents() {
 	GameState* nextState = currentState;
 	starEmitter->pos.x = mouseX/2;
 	starEmitter->pos.y = mouseY/2 - 20;
-	fireballEmitter->vel.x = 70.0;
-	fireballEmitter->pos.x = player->pos.x/2 + player->width/2;
+	fireballEmitter->vel.x = 80.0;
+	fireballEmitter->pos.x = player->pos.x/2 + player->width/3;
 	if(player->vel.x < 0){
-		fireballEmitter->pos.x = player->pos.x/2 - player->width/2;
+		fireballEmitter->pos.x = player->pos.x/2 - player->width/3;
 		fireballEmitter->vel.x = -70.0;
 		//fireballEmitter->textureID = textures["fireball_left"];
 	}
@@ -153,27 +155,28 @@ void GameApp::ProcessEvents() {
 				if(state.substr(0,3) == "map" && aniTime == 0){
 					fireballEmitter->is_on = true;
 					fireballEmitter->resetParticles();
+
 				}
+
 			}
 		}
 		if(event.type == SDL_MOUSEBUTTONDOWN) {       
 			if(state == "start" ){
-				if (currentState->ghostEntities["quitButton"]->collidesWith(cursor->pos.x, cursor->pos.y)){
-					done = true;
-				}
-				else if(currentState->ghostEntities["startButton"]->collidesWith(cursor->pos.x, cursor->pos.y)){
+				if(currentState->ghostEntities["startButton"]->collidesWith(cursor->pos.x, cursor->pos.y)){
 					nextState = gameStates["map1"];
 				}
 			}
-			else if(state == "map1" || state == "map2" || state == "map3"){
+			if(state == "map1" || state == "map2" || state == "map3"){
 				if (currentState->ghostEntities["pauseButton"]->collidesWith(cursor->pos.x, cursor->pos.y)){
 					nextState = gameStates["pause"];
 				}
 			} 
-			else if(state == "pause"){
+			if(state == "pause"){
 				if (currentState->ghostEntities["resumeButton"]->collidesWith(cursor->pos.x, cursor->pos.y)){
 					nextState = gameStates["map1"];
 				}
+			}
+			if(state == "start" || state == "pause" || state == "win" || state == "lose" ){
 				if (currentState->ghostEntities["quitButton"]->collidesWith(cursor->pos.x, cursor->pos.y)){
 					done = true;
 				}
@@ -214,11 +217,11 @@ void GameApp::ProcessEvents() {
 			player->accel.x = 120;
 		}
 	}
+	if(player->hp <= 0){
+		nextState = gameStates["lose"];
+	}
 	if(currentState != nextState){
 		currentState = nextState;
-		if(currentState->name == "map1"){
-		//	Mix_PlayMusic(musics["m1"], -1);
-		}
 	}
 }
 
@@ -237,7 +240,7 @@ void GameApp::Render() {
 		rainEmitter->render();
 	}
 	if (currentState->name.substr(0,3) == "map"){
-		displayText(to_string(player->hp), 180-orthoWidth/2,  400 - orthoHeight/2, 16, 16, 10);
+		displayText(to_string(int(player->hp)), 180-orthoWidth/2,  400 - orthoHeight/2, 16, 16, 10);
 	}
 	shader->setModelMatrix(cursor->matrix);
 	cursor->draw();
@@ -264,6 +267,23 @@ void GameApp::Update(float elapsed) {
 
 	if (currentState->name == "map3"){
 		rainEmitter->update(elapsed);
+	}
+
+	if(currentState->name.substr(0,3) == "map" && aniTime > 0.0f){
+		for(size_t i = 0; i < currentState->entities.size(); ++i){
+			if (currentState->entities[i]->name == "enemy" && currentState->entities[i]->hp > 0){
+				Entity temp = Entity(shader, sprites["button"], 470 - orthoWidth / 2, 440 - orthoHeight / 2);
+				temp.setWidthHeight(100, 60);
+				if(player->vel.x >= 0){
+					temp.setPos(player->pos.x, player->pos.y);
+				}else{
+					temp.setPos(player->pos.x-120, player->pos.y);
+				}
+				if (temp.collidesWith(*currentState->entities[i])){
+					currentState->entities[i]->hp -= 10 * elapsed;
+				}
+			}
+		}					
 	}
 }
 
@@ -328,7 +348,8 @@ void GameApp::loadSprites(){
 	sprites["star7"] = new SheetSprite(textures["star7"], 0.0f, 0.0f, 1.0f, 1.0f, 32.0f, 32.0f);
 	sprites["portal"] = new SheetSprite(textures["portal"], 0.0f, 0.0f, 1.0f, 1.0f, 64.0f, 100.0f);
 	sprites["fireball"] = new SheetSprite(textures["fireball_sheet"], 0.0f, 0.0f, 1.0f, 1.0f, 94.0f, 60.0f);
-
+	sprites["enemy"] = new SheetSprite(textures["enemy"], 0.0f, 0.0f, 1.0f, 1.0f, 36.0f, 36.0f);
+	sprites["background"] = new SheetSprite(textures["background"], 0.0f, 0.0f, 1.0f, 1.0f, 640.0f, 480.0f);
 
 	sprites["wizardStandR"] = new SheetSprite(textures["wizardStandR"], 0.0f, 0.0f, 1.0f, 1.0f, 48.0f, 48.0f);
 	sprites["wizardStandL"] = new SheetSprite(textures["wizardStandL"], 0.0f, 0.0f, 1.0f, 1.0f, 48.0f, 48.0f);
@@ -346,7 +367,8 @@ void GameApp::loadStates(){
 	
 	gameStates["start"] =  new GameState("start", this);
 	gameStates["pause"] =  new GameState("pause", this);
-	gameStates["win"] =  new GameState("pwin", this);
+	gameStates["win"] =  new GameState("win", this);
+	gameStates["lose"] =  new GameState("lose", this);
 	gameStates["map1"] = new MapState("map1", this);
 	gameStates["map2"] = new MapState("map2", this);
 	gameStates["map3"] = new MapState("map3", this);
@@ -354,16 +376,45 @@ void GameApp::loadStates(){
 	gameStates["start"]->textDatas.push_back(TextData("Start Game", -160, 112, 32, 32));
 	gameStates["start"]->textDatas.push_back(TextData("Quit", -64, -32, 32, 32));
 
+	Entity* background = new Entity( shader, sprites["background"], -320, 240);
 	Entity* startButton = new Entity( shader, sprites["button"], -186, 128);
 	startButton->setWidthHeight(370, 64);
 	Entity* quitButton = new Entity( shader, sprites["button"], -90, -16);
 	quitButton->setWidthHeight(190, 64);
 
+	Entity* enemy1 = new Entity(shader, sprites["enemy"], 1000, 400, false);
+	Entity* enemy2 = new Entity(shader, sprites["enemy"], 450, 400, false);
+	Entity* enemy3 = new Entity(shader, sprites["enemy"], 450, 500, false);
+	Entity* enemy4 = new Entity(shader, sprites["enemy"], 850, 500, false);
+	Entity* enemy5 = new Entity(shader, sprites["enemy"], 950, 500, false);
+	Entity* enemy6 = new Entity(shader, sprites["enemy"], 1050, 500, false);
+	enemy1->hp = 10;
+	enemy1->name = "enemy";
+	enemy2->hp = 10;
+	enemy2->name = "enemy";
+	enemy3->hp = 10;
+	enemy3->name = "enemy";
+	enemy4->hp = 10;
+	enemy4->name = "enemy";
+	enemy5->hp = 10;
+	enemy5->name = "enemy";
+	enemy6->hp = 10;
+	enemy6->name = "enemy";
 	//Add entities
+	gameStates["map1"]->entities.push_back(enemy1);
+	gameStates["map1"]->entities.push_back(enemy2);
+	gameStates["map2"]->entities.push_back(enemy3);
+	gameStates["map2"]->entities.push_back(enemy4);
+	gameStates["map3"]->entities.push_back(enemy5);
+	gameStates["map3"]->entities.push_back(enemy6);
+	gameStates["start"]->ghostEntities["background"] = background;
+	gameStates["pause"]->ghostEntities["background"] = background;
+	gameStates["win"]->ghostEntities["background"] = background;
+	gameStates["lose"]->ghostEntities["background"] = background;
 	gameStates["start"]->ghostEntities["startButton"] = startButton;
 	gameStates["start"]->ghostEntities["quitButton"] = quitButton;
-	
 	gameStates["win"]->textDatas.push_back(TextData("YOU WIN!!!", -160, 112, 40, 40));
+	gameStates["lose"]->textDatas.push_back(TextData("Death. You Lost...", -320, 112, 40, 40));
 	//map
 	gameStates["map1"]->textDatas.push_back(
 		TextData("Pause",
@@ -418,7 +469,9 @@ void GameApp::loadStates(){
 	pauseButton->setWidthHeight(100, 32);
 
 	Entity* portal1 = new Entity( shader, sprites["portal"], 1760,  160, false );
+	portal1->hp = 10000;
 	Entity* portal2 = new Entity( shader, sprites["portal"], 540,  480, false );
+	portal2->hp = 10000;
 	gameStates["map1"]->ghostEntities["hpBar"] = hpBar;
 	gameStates["map1"]->entities.push_back(player);
 	gameStates["map1"]->ghostEntities["pauseButton"] = pauseButton;
@@ -448,10 +501,12 @@ void GameApp::loadStates(){
 	gameStates["pause"]->textDatas.push_back(
 		TextData("Resume", -96,  182 , 32, 32));
 	gameStates["pause"]->textDatas.push_back(TextData("Quit", -64, -32, 32, 32));
-	
+	gameStates["win"]->textDatas.push_back(TextData("Quit", -64, -32, 32, 32));
+	gameStates["lose"]->textDatas.push_back(TextData("Quit", -64, -32, 32, 32));
 	gameStates["pause"]->ghostEntities["resumeButton"] = resumeButton;
 	gameStates["pause"]->ghostEntities["quitButton"] = quitButton;
-
+	gameStates["win"]->ghostEntities["quitButton"] = quitButton;
+	gameStates["lose"]->ghostEntities["quitButton"] = quitButton;
 
 	currentState = gameStates["start"];
 	//test particles

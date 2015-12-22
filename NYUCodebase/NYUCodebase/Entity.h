@@ -38,7 +38,7 @@ protected:
 	bool collideBot;
 	bool collideLeft;
 	bool collideRight;
-	int hp;
+	float hp;
 	std::string name;
 	float aniTime;
 };

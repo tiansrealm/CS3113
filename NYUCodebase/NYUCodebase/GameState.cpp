@@ -14,10 +14,12 @@ void GameState::render(){
 	setView();
 
 	for (size_t i = 0; i < entities.size(); ++i){
-		Matrix model = entities[i]->matrix;
-		//model.Rotate(entities[i]->rotation);
-		shader->setModelMatrix(model);
-		entities[i]->draw();
+		if(entities[i]->hp > 0){
+			Matrix model = entities[i]->matrix;
+			//model.Rotate(entities[i]->rotation);
+			shader->setModelMatrix(model);
+			entities[i]->draw();
+		}
 	}
 	for (size_t i = 0; i < staticEntities.size(); ++i) {
 		Matrix model = staticEntities[i]->matrix;
@@ -45,7 +47,11 @@ void GameState::render(){
 	}
 	shader->setViewMatrix(Matrix());
 
-
+	for (const auto & i : ghostEntities)
+	{
+		shader->setModelMatrix(i.second->matrix);
+		i.second->draw();
+	}
 	Matrix model;
 	for (size_t i = 0; i < emitters.size(); ++i){
 		if(emitters[i]->is_on){
@@ -54,11 +60,6 @@ void GameState::render(){
 			shader->setModelMatrix(model);
 			emitters[i]->render();
 		}
-	}
-	for (const auto & i : ghostEntities)
-	{
-		shader->setModelMatrix(i.second->matrix);
-		i.second->draw();
 	}
 	for (TextData td : textDatas){
 		app->displayText(td.text, td.x, td.y, td.font_w, td.font_h, td.spacing);
@@ -73,8 +74,18 @@ void GameState::update(float elapsed){
 		for (size_t j = 0; j < staticEntities.size(); j++){
 			entities[i]->collidesWith(*(staticEntities[j]), true);
 		}
-		if(entities[i]->hp <= 0){
-			entitiesToRemove.insert(i);
+		if (entities[i]->name == "enemy" && entities[i]->hp > 0){
+			if ((app->player->pos.x > entities[i]->pos.x - 150) &&
+				(app->player->pos.x < entities[i]->pos.x + 150)){
+				if (app->player->pos.x >= entities[i]->pos.x){
+					entities[i]->accel.x = 80;
+				}
+				else{ entities[i]->accel.x = -80; }
+			}
+
+			if(entities[i]->collidesWith(*app->player)){
+				app->player->hp -= elapsed * 10;
+			}
 		}
 	}
 	//for (size_t i = 0; i < staticEntities.size(); i++) {
@@ -105,6 +116,7 @@ void GameState::update(float elapsed){
 		ghostEntities["hpBar"]->setWidthHeight(
 			app->player->hp / 10 * 36, ghostEntities["hpBar"]->height);
 	}
+
 }
 void GameState::setView(){
 	Matrix viewMatrix;
@@ -270,9 +282,7 @@ bool MapState::readEntityData(std::ifstream &stream) {
 	return true;
 }
 void MapState::placeEntity(string& type, float x, float y){
-
-	SheetSprite* tileSprite = app->sprites[type];
-	Entity*  entity = new Entity(shader, tileSprite, x, y + 1, false);
-
+	SheetSprite* sprite = app->sprites[type];
+	Entity*  entity = new Entity(shader, sprite, x, y + 1, false);
 	entities.push_back(entity);
 }

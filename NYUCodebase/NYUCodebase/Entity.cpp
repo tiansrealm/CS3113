@@ -66,6 +66,7 @@ bool Entity::collidesWith(int x, int y){
 
 	return (x >= pos.x && x <= pos.x + width && y <= pos.y && y >= pos.y - height);
 }
+
 bool Entity::collidesWith(const Entity& other, bool applyShift){
 	if (shape == RECTANGLE && other.shape == RECTANGLE){
 		float r1Top = pos.y, r2Top = other.pos.y;
